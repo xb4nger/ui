@@ -470,7 +470,10 @@ function Library:MakeResizable(Instance, MinSize)
         Parent = Resizer;
     });
 
-
+    local ResizerImageUICorner = Library:Create('UICorner', {
+        CornerRadius = UDim.new(0, 0);
+        Parent = ResizerImage;
+    });
 
     Library:AddToRegistry(ResizerImage, { BackgroundColor3 = 'AccentColor'; });
 
@@ -486,6 +489,7 @@ function Library:MakeResizable(Instance, MinSize)
         ResizerImage.Size = UDim2.new(2, 0, 2, 0);
         ResizerImage.Parent = Resizer;
         ResizerImage.BackgroundTransparency = Transparency;
+        ResizerImageUICorner.Parent = ResizerImage;
         OffsetPos = nil;
     end;
 
@@ -496,6 +500,7 @@ function Library:MakeResizable(Instance, MinSize)
             ResizerImage.BackgroundTransparency = 1
             ResizerImage.Size = UDim2.fromOffset(Library.ScreenGui.AbsoluteSize.X, Library.ScreenGui.AbsoluteSize.Y);
             ResizerImage.Position = UDim2.new();
+            ResizerImageUICorner.Parent = nil;
             ResizerImage.Parent = Library.ScreenGui;
         end;
     end);
