@@ -1,0 +1,4361 @@
+getgenv().StarterScreen = "Default"
+
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+
+local protect_gui = protect_gui or (syn and syn.protect_gui) or function(gui)
+	if gethui then gui.Parent = gethui() else gui.Parent = CoreGui end
+end
+
+local function RandomString(len)
+	local s, c = "", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	for i = 1, len or 12 do
+		local r = math.random(1, #c)
+		s = s .. c:sub(r, r)
+	end
+	return s
+end
+
+local function Tween(o, t, p)
+	local tw = TweenService:Create(o, TweenInfo.new(t or 1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), p)
+	tw:Play()
+	return tw
+end
+
+local function ExampleHubLoader(cfg)
+	cfg = cfg or {}
+	cfg.Name = cfg.Name or "FrostWare"
+	cfg.Style = cfg.Style or "Default"
+	cfg.Scale = cfg.Scale or 3
+	cfg.Font = cfg.Font or Enum.Font.DenkOne -- use Denk One
+
+	local gui = Instance.new("ScreenGui")
+	gui.Name = RandomString()
+	gui.IgnoreGuiInset = true
+	gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+	protect_gui(gui)
+
+	local blur = Instance.new("BlurEffect")
+	blur.Size = 0
+	blur.Parent = Lighting
+
+	local bg = Instance.new("Frame")
+	bg.Size = UDim2.new(1, 0, 1, 0)
+	bg.BackgroundTransparency = 1
+	bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	bg.Parent = gui
+
+	local grad = Instance.new("UIGradient")
+	grad.Rotation = 0
+
+	if cfg.Style == "Halloween" then
+		grad.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(60, 0, 0)),
+			ColorSequenceKeypoint.new(0.5, Color3.fromRGB(150, 60, 0)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 0, 0))
+		}
+	elseif cfg.Style == "Christmas" then
+		grad.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 160, 80)),
+			ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 60, 60)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 160, 80))
+		}
+	else
+		grad.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(235, 245, 255)),
+			ColorSequenceKeypoint.new(0.4, Color3.fromRGB(170, 220, 255)),
+			ColorSequenceKeypoint.new(0.7, Color3.fromRGB(120, 190, 255)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(235, 245, 255))
+		}
+	end
+	grad.Parent = bg
+
+	local vignette = Instance.new("ImageLabel")
+	vignette.Size = UDim2.new(1.1, 0, 1.1, 0)
+	vignette.AnchorPoint = Vector2.new(0.5, 0.5)
+	vignette.Position = UDim2.new(0.5, 0, 0.5, 0)
+	vignette.BackgroundTransparency = 1
+	vignette.Image = "rbxassetid://7143647374"
+	vignette.ImageColor3 = Color3.fromRGB(180, 220, 255)
+	vignette.ImageTransparency = 1
+	vignette.ZIndex = 2
+	vignette.Parent = bg
+
+	local frame = Instance.new("Frame")
+	frame.AnchorPoint = Vector2.new(0.5, 0.5)
+	frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+	frame.BackgroundTransparency = 1
+	frame.Size = UDim2.new(0, 0, 0, 0)
+	frame.Parent = gui
+
+	local layout = Instance.new("UIListLayout")
+	layout.FillDirection = Enum.FillDirection.Horizontal
+	layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	layout.VerticalAlignment = Enum.VerticalAlignment.Center
+	layout.Padding = UDim.new(0, 6 * cfg.Scale)
+	layout.Parent = frame
+
+	Tween(blur, 2, { Size = 75 })
+	Tween(bg, 1.5, { BackgroundTransparency = 0.05 })
+	Tween(vignette, 2, { ImageTransparency = 0.2 })
+
+	task.spawn(function()
+		while gui.Parent do
+			grad.Rotation = grad.Rotation + 1
+			task.wait(0.05)
+		end
+	end)
+
+	task.wait(1.2)
+
+	local colorThemes = {
+		Default = {
+			Color3.fromRGB(220, 240, 255),
+			Color3.fromRGB(150, 210, 255),
+			Color3.fromRGB(90, 170, 255)
+		}
+	}
+
+	local theme = colorThemes[cfg.Style] or colorThemes.Default
+	local letters = {}
+
+	for _, ch in ipairs(cfg.Name:split("")) do
+		local holder = Instance.new("Frame")
+		holder.BackgroundTransparency = 1
+		holder.Size = UDim2.new(0, 32 * cfg.Scale, 0, 80 * cfg.Scale)
+		holder.Parent = frame
+
+		local lbl = Instance.new("TextLabel")
+		lbl.AnchorPoint = Vector2.new(0.5, 0.5)
+		lbl.Position = UDim2.new(0.5, 0, 0.5, 0)
+		lbl.BackgroundTransparency = 1
+		lbl.Font = cfg.Font
+		lbl.Text = ch
+		lbl.TextSize = 55
+		lbl.TextTransparency = 1
+		lbl.TextColor3 = Color3.new(1, 1, 1)
+		lbl.Rotation = 0 -- STRAIGHT
+		lbl.ZIndex = 5
+		lbl.Parent = holder
+
+		local gradTxt = Instance.new("UIGradient")
+		gradTxt.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0, theme[1]),
+			ColorSequenceKeypoint.new(0.5, theme[2]),
+			ColorSequenceKeypoint.new(1, theme[3])
+		}
+		gradTxt.Rotation = -45
+		gradTxt.Parent = lbl
+
+		local scale = Instance.new("UIScale")
+		scale.Scale = cfg.Scale
+		scale.Parent = lbl
+
+		table.insert(letters, lbl)
+	end
+
+	for i, lbl in ipairs(letters) do
+		task.delay(i * 0.15, function()
+			Tween(lbl, 0.8, { TextTransparency = 0, Rotation = 0 })
+		end)
+	end
+
+	task.wait(#letters * 0.15 + 2.5)
+
+	for i, lbl in ipairs(letters) do
+		task.delay(i * 0.1, function()
+			Tween(lbl, 1, {
+				TextTransparency = 1,
+				Position = lbl.Position + UDim2.new(0, 0, 0.5, 0)
+			})
+		end)
+	end
+
+	task.wait(1.5)
+	Tween(vignette, 2, { ImageTransparency = 1 })
+	Tween(blur, 2, { Size = 0 })
+	Tween(bg, 2, { BackgroundTransparency = 1 })
+	task.wait(1.2)
+end
+
+local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/b4ngerlols/yes/refs/heads/main/mhm!",true))()
+
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+local Options = Library.Options
+local Toggles = Library.Toggles
+
+
+
+
+ ExampleHubLoader({
+	Name = "FrostWare",
+	Style = getgenv().StarterScreen,
+	Scale = 3.5,
+	Font = Enum.Font.PermanentMarker
+})
+
+
+
+
+
+local Window = Library:CreateWindow({
+
+    Title = 'FrostWare',
+    Center = true,
+    AutoShow = true,
+    TabPadding = 8,
+    Footer = "FrostWare | Updated: 3/20/2026 | Undetected",
+    MenuFadeTime = 0.2
+})
+
+local Tabs = {
+    Main = Window:AddTab('Main'),
+    Visuals = Window:AddTab('Visuals'),
+    Misc = Window:AddTab('Misc'),
+    QuickShop = Window:AddTab('QuickShop'),
+    ['Settings'] = Window:AddTab('UI'),
+}
+
+
+
+local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+local player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded:Wait()
+local playerGui = player:WaitForChild("PlayerGui")
+
+local BackgroundTransparency = 0.025
+
+if playerGui:FindFirstChild("TrxpFrame") then
+    playerGui.TrxpFrame:Destroy()
+end
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TrxpFrame"
+screenGui.IgnoreGuiInset = true
+screenGui.Parent = playerGui
+
+local blur = Instance.new("BlurEffect")
+blur.Size = 0
+blur.Parent = Lighting
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(1, 0, 1, 0)
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+frame.BackgroundTransparency = 1
+frame.Parent = screenGui
+
+local label = Instance.new("TextLabel")
+label.Size = UDim2.new(1, 0, 1, 0)
+label.AnchorPoint = Vector2.new(0.5, 0.5)
+label.Position = UDim2.new(0.5, 0, 0.5, 0)
+label.BackgroundTransparency = 1
+label.TextScaled = true  -- Makes text automatically fit
+label.TextSize = 140
+label.Font = Enum.Font.DenkOne
+label.RichText = false
+label.TextColor3 = Color3.new(1, 1, 1)
+label.Text = "FrostWare"
+
+local grad = Instance.new("UIGradient")
+grad.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(170, 220, 255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 235, 255))
+}
+grad.Rotation = -45
+grad.Parent = label
+
+label.TextXAlignment = Enum.TextXAlignment.Center
+label.TextYAlignment = Enum.TextYAlignment.Center
+label.TextTransparency = 1
+label.Parent = frame
+
+function FadeIn(speed)
+	TweenService:Create(frame, TweenInfo.new(speed), {
+		BackgroundTransparency = BackgroundTransparency
+	}):Play()
+
+	TweenService:Create(label, TweenInfo.new(speed), {
+		TextTransparency = 0
+	}):Play()
+
+	TweenService:Create(blur, TweenInfo.new(speed), {
+		Size = 40
+	}):Play()
+end
+
+function FadeOut(speed)
+	TweenService:Create(frame, TweenInfo.new(speed), {
+		BackgroundTransparency = 1
+	}):Play()
+
+	TweenService:Create(label, TweenInfo.new(speed), {
+		TextTransparency = 1
+	}):Play()
+
+	TweenService:Create(blur, TweenInfo.new(speed), {
+		Size = 0
+	}):Play()
+end
+
+
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local function teleportTo(cf)
+	local char = player.Character or player.CharacterAdded:Wait()
+	local hrp = char:WaitForChild("HumanoidRootPart")
+
+	hrp.Anchored = true
+	hrp.CFrame = cf
+	hrp.AssemblyLinearVelocity = Vector3.zero
+	hrp.AssemblyAngularVelocity = Vector3.zero
+	task.defer(function()
+		hrp.Anchored = false
+		hrp.AssemblyLinearVelocity = Vector3.zero
+		hrp.AssemblyAngularVelocity = Vector3.zero
+	end)
+end
+
+
+
+
+local SAGroupbox = Tabs.Main:AddLeftGroupbox("Silent Aim")
+local DupeGunBox = Tabs.Main:AddLeftGroupbox('Guns')
+local MDupe = Tabs.Main:AddRightGroupbox('Money')
+local TargetBox = Tabs.Main:AddRightGroupbox('Target')
+local LeftGroupBox = Tabs.Main:AddLeftGroupbox('Hitbox Expander')
+local ESPGroupbox = Tabs.Visuals:AddLeftGroupbox('ESP')
+local TabBox = Tabs.Visuals:AddLeftTabbox()
+local WalkGroupbox = Tabs.Misc:AddLeftGroupbox('Movement')
+local ExtraBox = Tabs.Misc:AddLeftGroupbox('Bypasses')
+local DropBox = Tabs.Misc:AddLeftGroupbox('Auto Drop')
+local ExtraBox1 = Tabs.Misc:AddRightGroupbox('Teleports')
+local FarmsBox = Tabs.Misc:AddRightGroupbox('Farms')
+local GUIsBox = Tabs.Visuals:AddRightGroupbox('GUIs')
+local BankBox = Tabs.Misc:AddRightGroupbox('Bank Withdraw/Deposit')
+local Cars1 = Tabs.Misc:AddRightGroupbox('Extra')
+local QuickShopLeftGroup = Tabs.QuickShop:AddLeftGroupbox('Shop')
+local QuickShopRightGroup = Tabs.QuickShop:AddRightGroupbox('ExoticDealer')
+local Bckpack = Tabs.QuickShop:AddLeftGroupbox('BackPacks')
+local gunshop = Tabs.QuickShop:AddRightGroupbox('Guns')
+local ammos = Tabs.QuickShop:AddLeftGroupbox('Ammo')
+local Tab1 = Tabs.Visuals:AddLeftGroupbox("Local Chams")
+
+
+
+
+
+
+
+
+local Settings = {
+    SilentAimEnabled = false,
+    FOVRadius = 250,
+    ShowFOV = false,
+    ShowSnapline = false
+}
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local FOVCircle = Drawing.new("Circle")
+FOVCircle.Visible = Settings.ShowFOV
+FOVCircle.Color = Color3.fromRGB(255, 255, 255)
+FOVCircle.Thickness = 1.5
+FOVCircle.NumSides = 100
+FOVCircle.Radius = Settings.FOVRadius
+FOVCircle.Filled = false
+
+local Snapline = Drawing.new("Line")
+Snapline.Visible = false
+Snapline.Color = Color3.fromRGB(255, 255, 255)
+Snapline.Thickness = 1.5
+
+local function getClosestToCrosshair()
+    local screenCenter = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
+    local closest, bestDist = nil, (Settings.ShowFOV and Settings.FOVRadius or math.huge)
+
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
+            local head = plr.Character.Head
+            local sp, onScreen = Camera:WorldToViewportPoint(head.Position)
+            if onScreen then
+                local d = (Vector2.new(sp.X, sp.Y) - screenCenter).Magnitude
+
+                if (not Settings.ShowFOV or d <= Settings.FOVRadius) and d < bestDist then
+                    bestDist = d
+                    closest = plr
+                end
+            end
+        end
+    end
+
+    return closest
+end
+
+local function silent_kill()
+    if not Settings.SilentAimEnabled then return end
+    local targetPlayer = getClosestToCrosshair()
+    if not targetPlayer or not targetPlayer.Character then return end
+    local hitpart = targetPlayer.Character:FindFirstChild("Head")
+    if not hitpart then return end
+
+    local char = LocalPlayer.Character
+    if not char then return end
+    local tool = char:FindFirstChildOfClass("Tool")
+    if not tool or not tool:FindFirstChild("Handle") then return end
+
+    local damage = math.huge
+    local hitpos = hitpart.Position
+
+    local setting = tool:FindFirstChild("Setting")
+    if setting then
+        pcall(function()
+            require(setting).Range = 10000
+        end)
+    end
+
+    local VM = ReplicatedStorage:FindFirstChild("VisualizeMuzzle")
+    local VB = ReplicatedStorage:FindFirstChild("VisualizeBullet")
+    local IT = ReplicatedStorage:FindFirstChild("InflictTarget")
+    if not (VM and VB and IT) then return end
+
+    VM:FireServer(
+        tool.Handle,
+        true,
+        { false, 7, Color3.new(1, 1.1098, 0), 15, true, 0.02 },
+        tool.GunScript_Local and tool.GunScript_Local.MuzzleEffect
+    )
+
+    VB:FireServer(
+        tool,
+        tool.Handle,
+        Vector3.new(-0.177, 0.088, 0.980),
+        tool.Handle:FindFirstChild("GunFirePoint"),
+        {
+            true,
+            {112139677907600, 92977228204408, 112139677907600, 92977228204408},
+            1, 1, 10,
+            tool.GunScript_Local and tool.GunScript_Local.HitEffect,
+            true
+        },
+        {
+            true,
+            {0, 0, 0, 0, 0, 0},
+            1, 1, 1,
+            tool.GunScript_Local and tool.GunScript_Local.BloodEffect
+        },
+        {
+            true,
+            0.2,
+            {3696144972},
+            true, 7, 1
+        },
+        {
+            false, 8, true,
+            {163064102},
+            1, 1.5, 1,
+            false,
+            tool.GunScript_Local and tool.GunScript_Local.ExplosionEffect
+        },
+        {
+            false,
+            Vector3.new(0.1, 0, 0),
+            Vector3.new(-0.1, 0, 0),
+            tool.GunScript_Local and tool.GunScript_Local.TracerEffect,
+            nil,
+            tool.GunScript_Local and tool.GunScript_Local.ParticleEffect,
+            300, 526, 0,
+            Vector3.zero,
+            Vector3.new(0.4, 0.4, 0.4),
+            Color3.new(0.639, 0.635, 0.611),
+            1,
+            Enum.Material.Neon,
+            Enum.PartType.Cylinder,
+            false,
+            6696543809,
+            0,
+            Vector3.new(0.007, 0.007, 0.007)
+        },
+        {
+            true,
+            {269514869, 269514887, 269514807, 269514817},
+            0.5, 1, 1.5, 100
+        },
+        {
+            false,
+            3,
+            Color3.new(1, 0.647, 0.6),
+            6,
+            true
+        }
+    )
+
+    IT:FireServer(
+        tool,
+        LocalPlayer,
+        targetPlayer.Character:FindFirstChildOfClass("Humanoid"),
+        hitpart,
+        damage,
+        {
+            0, 0, false, false,
+            tool.GunScript_Server and tool.GunScript_Server.IgniteScript,
+            tool.GunScript_Server and tool.GunScript_Server.IcifyScript,
+            100, 100
+        },
+        { false, 5, 3 },
+        hitpart,
+        { false, {1930359546}, 1, 1.5, 1 },
+        hitpos,
+        Vector3.new(0.074, -0.099, -0.992),
+        true
+    )
+end
+
+UserInputService.InputBegan:Connect(function(input, gp)
+    if gp then return end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        silent_kill()
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    local screenCenter = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
+
+    FOVCircle.Position = screenCenter
+    FOVCircle.Radius = Settings.FOVRadius
+    FOVCircle.Visible = Settings.ShowFOV
+
+    if Settings.ShowSnapline and Settings.SilentAimEnabled then
+        local t = getClosestToCrosshair()
+        if t and t.Character and t.Character:FindFirstChild("Head") then
+            local sp, onScreen = Camera:WorldToViewportPoint(t.Character.Head.Position)
+            if onScreen then
+                Snapline.Visible = true
+                Snapline.From = screenCenter
+                Snapline.To = Vector2.new(sp.X, sp.Y)
+            else
+                Snapline.Visible = false
+            end
+        else
+            Snapline.Visible = false
+        end
+    else
+        Snapline.Visible = false
+    end
+end)
+
+SAGroupbox:AddToggle('SilentAimToggle', {
+    Text = 'Silent Aim [ PC ]',
+    Default = false,
+    Callback = function(v)
+        Settings.SilentAimEnabled = v
+    end
+})
+
+SAGroupbox:AddToggle('SnaplinesToggle', {
+    Text = 'Snaplines',
+    Default = false,
+    Callback = function(v)
+        Settings.ShowSnapline = v
+    end
+})
+
+SAGroupbox:AddToggle('VisualizeFOV', {
+    Text = 'FOV',
+    Default = false,
+    Callback = function(v)
+        Settings.ShowFOV = v
+    end
+})
+
+SAGroupbox:AddSlider('FOVSlider', {
+    Text = 'FOV',
+    Default = 100,
+    Min = 20,
+    Max = 1000,
+    Rounding = 0,
+    Callback = function(v)
+        Settings.FOVRadius = v
+    end
+})
+
+
+
+
+
+
+
+
+
+
+
+
+local ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"))
+local Players = cloneref(game:GetService("Players"))
+
+local Player = Players.LocalPlayer
+local Character, Backpack
+
+local function updateCharacter()
+    Character = Player.Character or Player.CharacterAdded:Wait()
+    Backpack = Player:WaitForChild("Backpack")
+end
+
+updateCharacter()
+
+Player.CharacterAdded:Connect(function()
+    updateCharacter()
+end)
+
+local running = false
+
+local BLACKLIST = {
+    ["Fist"] = true,
+    ["Phone"] = true,
+}
+
+local function getValidTool()
+
+    for _, tool in ipairs(Character:GetChildren()) do
+        if tool:IsA("Tool") and not BLACKLIST[tool.Name] then
+            return tool
+        end
+    end
+
+    for _, tool in ipairs(Backpack:GetChildren()) do
+        if tool:IsA("Tool") and not BLACKLIST[tool.Name] then
+            return tool
+        end
+    end
+    return nil
+end
+
+local function getPing()
+    if typeof(Player.GetNetworkPing) == "function" then
+        local s, r = pcall(function()
+            return tonumber(string.match(Player:GetNetworkPing(), "%d+"))
+        end)
+        if s and r then return r end
+    end
+    local t0 = tick()
+    local v = Instance.new("BoolValue")
+    v.Parent = ReplicatedStorage
+    v.Name = "PingTest_" .. tostring(math.random(10000, 99999))
+    task.wait(0.1)
+    local t1 = tick()
+    v:Destroy()
+    return math.clamp((t1 - t0) * 1000, 50, 300)
+end
+
+local function dupeOne()
+    local Tool = getValidTool()
+    if not Tool then return end
+
+    Tool.Parent = Backpack
+    task.wait(0.5)
+
+    local ToolName = Tool.Name
+    local ToolId
+    local delay = 0.25 + ((math.clamp(getPing(), 0, 300) / 300) * 0.03)
+
+    local conn; conn = ReplicatedStorage.MarketItems.ChildAdded:Connect(function(item)
+        if item.Name == ToolName then
+            local owner = item:WaitForChild("owner", 2)
+            if owner and owner.Value == Player.Name then
+                ToolId = item:GetAttribute("SpecialId")
+            end
+        end
+    end)
+
+    task.spawn(function()
+        ReplicatedStorage.ListWeaponRemote:FireServer(ToolName, 99999)
+    end)
+
+    task.wait(delay)
+
+    task.spawn(function()
+        ReplicatedStorage.BackpackRemote:InvokeServer("Store", ToolName)
+    end)
+
+    task.wait(3)
+
+    if ToolId then
+        task.spawn(function()
+            ReplicatedStorage.BuyItemRemote:FireServer(ToolName, "Remove", ToolId)
+        end)
+    end
+
+    task.spawn(function()
+        ReplicatedStorage.BackpackRemote:InvokeServer("Grab", ToolName)
+    end)
+
+    conn:Disconnect()
+end
+
+task.spawn(function()
+    while true do
+        if running then
+            dupeOne()
+            task.wait(1.5)
+        else
+            task.wait(0.1)
+        end
+    end
+end)
+
+DupeGunBox:AddButton('Dupe Gun', function()
+    dupeOne()
+end)
+
+DupeGunBox:AddToggle('AutoDupeGunToggle', {
+    Text = 'Auto Dupe Gun',
+    Default = false,
+    Callback = function(v)
+        running = v
+    end,
+})
+
+local AlwaysAutomatic = false
+local NoRecoil = false
+local NoSpread = false
+local FireRateBoost = false
+
+local WeaponTables = {}
+local originalDamages = {}
+
+local function cacheWeaponTables()
+    WeaponTables = {}
+    for _, obj in ipairs(getgc(true)) do
+        if typeof(obj) == "table" and rawget(obj, "FireRate") then
+            table.insert(WeaponTables, obj)
+        end
+    end
+end
+
+local function setupAutoRefresh()
+    local player = game:GetService("Players").LocalPlayer
+    
+    player.CharacterAdded:Connect(function()
+        task.wait(1)
+        cacheWeaponTables()
+    end)
+    
+    if player.Character then
+        player.Character.ChildAdded:Connect(function(child)
+            if child:IsA("Tool") then
+                task.spawn(cacheWeaponTables)
+            end
+        end)
+    end
+end
+
+cacheWeaponTables()
+setupAutoRefresh()
+
+local function getEquippedTool()
+    local char = game:GetService("Players").LocalPlayer.Character
+    if not char then return nil end
+    return char:FindFirstChildOfClass("Tool")
+end
+
+local function applyInfDamage(state)
+    local tool = getEquippedTool()
+    if not tool then return end
+    
+    local setting = tool:FindFirstChild("Setting")
+    if not setting then return end
+    
+    local toolKey = tool:GetDebugId()
+    
+    if state then
+        if not originalDamages[toolKey] then
+            originalDamages[toolKey] = setting.BaseDamage.Value or setting.BaseDamage
+        end
+        setting.BaseDamage = 9e9
+    else
+        if originalDamages[toolKey] then
+            setting.BaseDamage = originalDamages[toolKey]
+            originalDamages[toolKey] = nil
+        end
+    end
+end
+
+local RunService = game:GetService("RunService")
+local modConnection
+
+local function anyModEnabled()
+    return AlwaysAutomatic or NoRecoil or NoSpread or FireRateBoost or InfDamageEnabled
+end
+
+local function startModLoop()
+    if modConnection then return end
+    
+    modConnection = RunService.Heartbeat:Connect(function()
+        if not anyModEnabled() then
+            if modConnection then
+                modConnection:Disconnect()
+                modConnection = nil
+            end
+            applyInfDamage(false)
+            return
+        end
+        
+        for _, weapon in ipairs(WeaponTables) do
+            pcall(function()
+                rawset(weapon, "FireAnimationSpeed", 100)
+                rawset(weapon, "FlamingBullet", true)
+                rawset(weapon, "Auto", AlwaysAutomatic)
+                rawset(weapon, "FireMode", AlwaysAutomatic and "Auto" or (rawget(weapon, "FireMode") or "Semi"))
+                rawset(weapon, "BurstAmount", AlwaysAutomatic and 1 or (rawget(weapon, "BurstAmount") or 1))
+                rawset(weapon, "ShotsPerBurst", AlwaysAutomatic and 1 or (rawget(weapon, "ShotsPerBurst") or 1))
+                
+                rawset(weapon, "CameraRecoilingEnabled", not NoRecoil)
+                rawset(weapon, "Recoil", NoRecoil and 0 or (rawget(weapon, "Recoil") or 1))
+                rawset(weapon, "Accuracy", NoSpread and 0 or (rawget(weapon, "Accuracy") or 1))
+                rawset(weapon, "FireRate", FireRateBoost and 0.01 or (rawget(weapon, "FireRate") or 0.1))
+            end)
+        end
+        
+        applyInfDamage(InfDamageEnabled)
+    end)
+end
+
+DupeGunBox:AddToggle('AlwaysAutomaticToggle', {
+    Text = 'Always Automatic',
+    Default = false,
+    Callback = function(v)
+        AlwaysAutomatic = v
+        if anyModEnabled() then
+            startModLoop()
+        else
+            if modConnection then
+                modConnection:Disconnect()
+                modConnection = nil
+            end
+        end
+    end,
+})
+
+DupeGunBox:AddToggle('NoRecoilToggle', {
+    Text = 'No Recoil',
+    Default = false,
+    Callback = function(v)
+        NoRecoil = v
+        if anyModEnabled() then
+            startModLoop()
+        else
+            if modConnection then
+                modConnection:Disconnect()
+                modConnection = nil
+            end
+        end
+    end,
+})
+
+DupeGunBox:AddToggle('NoSpreadToggle', {
+    Text = 'No Spread',
+    Default = false,
+    Callback = function(v)
+        NoSpread = v
+        if anyModEnabled() then
+            startModLoop()
+        else
+            if modConnection then
+                modConnection:Disconnect()
+                modConnection = nil
+            end
+        end
+    end,
+})
+
+
+
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local InfiniteMags = false
+local OldWeaponValues = {}
+local SetInfiniteAmmo = {}
+
+local function GetAllTools(includeCharacter)
+    local tools = {}
+
+    for _,v in ipairs(LocalPlayer.Backpack:GetChildren()) do
+        if v:IsA("Tool") then
+            table.insert(tools, v)
+        end
+    end
+
+    if includeCharacter and LocalPlayer.Character then
+        for _,v in ipairs(LocalPlayer.Character:GetChildren()) do
+            if v:IsA("Tool") then
+                table.insert(tools, v)
+            end
+        end
+    end
+
+    return tools
+end
+
+local function SaveOldValues(tool)
+    local moduleScript = tool:FindFirstChildOfClass("ModuleScript")
+    if not moduleScript or moduleScript.Name ~= "Setting" then return end
+
+    local Module = require(moduleScript)
+
+    if type(Module) == "table" and not OldWeaponValues[tool] then
+        OldWeaponValues[tool] = {}
+        for i,v in pairs(Module) do
+            OldWeaponValues[tool][i] = v
+        end
+    end
+end
+
+local function ApplyInfinite(tool)
+    if not tool:IsA("Tool") then return end
+
+    local gunScript = tool:FindFirstChild("GunScript_Local")
+    if not gunScript then return end
+
+    local env = getsenv(gunScript)
+    if not env then return end
+
+    local moduleScript = tool:FindFirstChildOfClass("ModuleScript")
+    local Module
+
+    if moduleScript and moduleScript.Name == "Setting" then
+        Module = require(moduleScript)
+    end
+
+    if InfiniteMags then
+        if env.Reload then
+            debug.setupvalue(env.Reload, 1, 1e1)
+            SetInfiniteAmmo[tool] = true
+        end
+
+        if Module then
+            Module.LimitedAmmoEnabled = false
+        end
+    else
+        if SetInfiniteAmmo[tool] and OldWeaponValues[tool] then
+            debug.setupvalue(env.Reload, 1, OldWeaponValues[tool].AmmoPerMag)
+            SetInfiniteAmmo[tool] = nil
+        end
+
+        if Module and OldWeaponValues[tool] then
+            Module.LimitedAmmoEnabled = OldWeaponValues[tool].LimitedAmmoEnabled
+        end
+    end
+end
+
+local function ApplyToAll()
+    for _,tool in ipairs(GetAllTools(true)) do
+        SaveOldValues(tool)
+        ApplyInfinite(tool)
+    end
+end
+
+
+DupeGunBox:AddToggle("InfiniteMags", {
+    Text = "Infinite Clips",
+    Default = false,
+    Callback = function(state)
+        InfiniteMags = state
+        ApplyToAll()
+    end
+})
+
+
+LocalPlayer.CharacterAdded:Connect(function(char)
+    char.ChildAdded:Connect(function(child)
+        if child:IsA("Tool") then
+            task.wait()
+            SaveOldValues(child)
+            ApplyInfinite(child)
+        end
+    end)
+end)
+
+LocalPlayer.Backpack.ChildAdded:Connect(function(child)
+    if child:IsA("Tool") then
+        task.wait()
+        SaveOldValues(child)
+        ApplyInfinite(child)
+    end
+end)
+
+
+DupeGunBox:AddToggle('FireRateBoostToggle', {
+    Text = 'Fire Rate Boost',
+    Default = false,
+    Callback = function(v)
+        FireRateBoost = v
+        if anyModEnabled() then
+            startModLoop()
+        else
+            if modConnection then
+                modConnection:Disconnect()
+                modConnection = nil
+            end
+        end
+    end,
+})
+
+
+
+
+
+
+
+local function anyModEnabled()
+    return AlwaysAutomatic or NoRecoil or NoSpread or FireRateBoost or InfDamageEnabled or FastReload
+end
+
+
+local RunService = game:GetService("RunService")
+local modConnection
+
+local function startModLoop()
+    if modConnection then return end
+    
+    modConnection = RunService.Heartbeat:Connect(function()
+        if not anyModEnabled() then
+            if modConnection then
+                modConnection:Disconnect()
+                modConnection = nil
+            end
+            applyInfDamage(InfDamageEnabled)
+            return
+        end
+        
+        for _, weapon in ipairs(WeaponTables) do
+            pcall(function()
+                rawset(weapon, "FireAnimationSpeed", 100)
+                rawset(weapon, "FlamingBullet", true)
+                rawset(weapon, "Auto", AlwaysAutomatic)
+                rawset(weapon, "FireMode", AlwaysAutomatic and "Auto" or (rawget(weapon, "FireMode") or "Semi"))
+                rawset(weapon, "BurstAmount", AlwaysAutomatic and 1 or (rawget(weapon, "BurstAmount") or 1))
+                rawset(weapon, "ShotsPerBurst", AlwaysAutomatic and 1 or (rawget(weapon, "ShotsPerBurst") or 1))
+                
+                rawset(weapon, "CameraRecoilingEnabled", not NoRecoil)
+                rawset(weapon, "Recoil", NoRecoil and 0 or (rawget(weapon, "Recoil") or 1))
+                rawset(weapon, "Accuracy", NoSpread and 0 or (rawget(weapon, "Accuracy") or 1))
+                rawset(weapon, "FireRate", FireRateBoost and 0.01 or (rawget(weapon, "FireRate") or 0.1))
+                
+
+                rawset(weapon, "ReloadTime", FastReload and 0.2 or (rawget(weapon, "ReloadTime") or 1))
+            end)
+        end
+        
+        applyInfDamage(InfDamageEnabled)
+    end)
+end
+
+
+
+
+MDupe:AddLabel("STEPS")
+MDupe:AddLabel("Click Buy Ingredients")
+MDupe:AddLabel("Tp To Penthouse")
+MDupe:AddLabel("Cook Koolaid")
+MDupe:AddLabel("Tp To Koolaid Seller")
+MDupe:AddLabel("Make Sure You Can See Press E To Sell")
+MDupe:AddLabel("Press Dupe")
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local exoticRemote = ReplicatedStorage:WaitForChild("ExoticShopRemote", 5)
+
+
+
+
+MDupe:AddButton("Teleport to Penthouse", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-163, 397, -594)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+
+
+MDupe:AddButton("Teleport to Sell Juice", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-71.63, 287.06, -319.95)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+
+MDupe:AddButton('Buy Ingredients', function()
+    if not exoticRemote then return end
+    exoticRemote:InvokeServer("Ice-Fruit Bag")
+    exoticRemote:InvokeServer("Ice-Fruit Cupz")
+    exoticRemote:InvokeServer("FijiWater")
+    exoticRemote:InvokeServer("FreshWater")
+    Library:Notify("Bought all ingredients.", 3)
+end)
+
+
+
+
+
+
+MDupe:AddButton('Dupe', function()
+    local Workspace = game:GetService("Workspace")
+    local IceFruitSellPart = Workspace:FindFirstChild("IceFruit Sell")
+    if not IceFruitSellPart then
+        Library:Notify("IceFruit Sell part not found.", 3)
+        return
+    end
+    local prompt = IceFruitSellPart:FindFirstChildOfClass("ProximityPrompt")
+    if not prompt then
+        Library:Notify("ProximityPrompt not found inside IceFruit Sell.", 3)
+        return
+    end
+    Library:Notify("Starting Cupz Money Method...", 3)
+    for i = 1, 5000 do
+        task.spawn(function()
+            prompt:InputHoldBegin()
+            prompt:InputHoldEnd()
+        end)
+    end
+    Library:Notify("Money Dupe Done", 3)
+end)
+
+
+local instantPromptConn
+local function updateInstantInteraction(enabled)
+    if enabled then
+        -- Apply once to existing prompts
+        for _, v in ipairs(Workspace:GetDescendants()) do
+            if v:IsA("ProximityPrompt") then
+                v.HoldDuration = 0
+            end
+        end
+
+        -- Connect only once
+        if not instantPromptConn then
+            instantPromptConn = Workspace.DescendantAdded:Connect(function(v)
+                if v:IsA("ProximityPrompt") then
+                    v.HoldDuration = 0
+                end
+            end)
+        end
+    else
+
+
+        if instantPromptConn then
+            instantPromptConn:Disconnect()
+            instantPromptConn = nil
+        end
+    end
+end
+
+MDupe:AddToggle('InstantInteraction', {
+    Text = 'Instant Interaction',
+    Default = false,
+}):OnChanged(function(value)
+    updateInstantInteraction(value)
+end)
+getgenv().Players = cloneref(game:GetService("Players"))
+getgenv().LocalPlayer = getgenv().Players.LocalPlayer
+getgenv().ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"))
+getgenv().Camera = workspace.CurrentCamera
+
+getgenv().kill_gun = function(targetPlayer)
+    if not targetPlayer or not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("Head") then return end
+    
+    getgenv().character = getgenv().LocalPlayer.Character
+    if not getgenv().character then return end
+    
+    getgenv().tool = getgenv().character:FindFirstChildOfClass("Tool")
+    if not getgenv().tool then return end
+    
+    getgenv().hitpart = targetPlayer.Character.Head
+    getgenv().hitpos = getgenv().hitpart.Position
+    getgenv().damage = math.huge
+    
+    getgenv().setting = getgenv().tool:FindFirstChild("Setting")
+    if getgenv().setting then
+        pcall(function()
+            require(getgenv().setting).Range = 10000
+        end)
+    end
+    
+    getgenv().ReplicatedStorage.VisualizeMuzzle:FireServer(
+        getgenv().tool.Handle,
+        true,
+        {false, 7, Color3.new(1, 1, 0), 15, true, 0.02},
+        getgenv().tool.GunScript_Local.MuzzleEffect
+    )
+    
+    getgenv().ReplicatedStorage.VisualizeBullet:FireServer(
+        getgenv().tool,
+        getgenv().tool.Handle,
+        Vector3.new(-0.177, 0.088, 0.980),
+        getgenv().tool.Handle.GunFirePoint,
+        {true, {112139677907600, 92977228204408, 112139677907600, 92977228204408}, 1, 1, 10, getgenv().tool.GunScript_Local.HitEffect, true},
+        {true, {0,0,0,0,0,0}, 1,1,1, getgenv().tool.GunScript_Local.BloodEffect},
+        {true, 0.2, {3696144972}, true, 7, 1},
+        {false, 8, true, {163064102}, 1, 1.5, 1, false, getgenv().tool.GunScript_Local.ExplosionEffect},
+        {false, Vector3.new(0.1,0,0), Vector3.new(-0.1,0,0), getgenv().tool.GunScript_Local.TracerEffect, nil, getgenv().tool.GunScript_Local.ParticleEffect, 300, 526, 0, Vector3.zero, Vector3.new(0.4,0.4,0.4), Color3.new(0.639,0.635,0.611), 1, Enum.Material.Neon, Enum.PartType.Cylinder, false, 6696543809, 0, Vector3.new(0.007,0.007,0.007)},
+        {true, {269514869,269514887,269514807,269514817}, 0.5, 1, 1.5, 100},
+        {false, 3, Color3.new(1,0.647,0.6), 6, true}
+    )
+    
+    getgenv().ReplicatedStorage.InflictTarget:FireServer(
+        getgenv().tool,
+        getgenv().LocalPlayer,
+        targetPlayer.Character:FindFirstChildOfClass("Humanoid"),
+        getgenv().hitpart,
+        getgenv().damage,
+        {0, 0, false, false, getgenv().tool.GunScript_Server.IgniteScript, getgenv().tool.GunScript_Server.IcifyScript, 100, 100},
+        {false, 5, 3},
+        getgenv().hitpart,
+        {false, {1930359546}, 1, 1.5, 1},
+        getgenv().hitpos,
+        Vector3.new(0.074, -0.099, -0.992),
+        true
+    )
+end
+
+getgenv().updatePlayerList = function()
+    getgenv().playerList = {}
+    for _, plr in getgenv().Players:GetPlayers() do
+        if plr ~= getgenv().LocalPlayer then
+            table.insert(getgenv().playerList, plr.Name)
+        end
+    end
+    return getgenv().playerList
+end
+
+getgenv().killBringEnabled = false
+getgenv().SelectedPlayer = nil
+getgenv().originalPositions = {}
+
+getgenv().playerDropdown = TargetBox:AddDropdown('PlayerDropdown', {
+    Values = getgenv().updatePlayerList(),
+    Default = '',
+    Multi = false,
+    Text = 'Select Player',
+}):OnChanged(function(name)
+    getgenv().SelectedPlayer = getgenv().Players:FindFirstChild(name)
+end)
+
+task.spawn(function()
+    while task.wait(1) do
+        if getgenv().playerDropdown then
+            getgenv().currentSelection = getgenv().SelectedPlayer and getgenv().SelectedPlayer.Name or ''
+            getgenv().playerDropdown:SetValues(getgenv().updatePlayerList())
+            if getgenv().currentSelection ~= '' and getgenv().Players:FindFirstChild(getgenv().currentSelection) then
+                getgenv().playerDropdown:SetValue(getgenv().currentSelection)
+            end
+        end
+    end
+end)
+
+getgenv().cashLabel   = TargetBox:AddLabel("Cash: 💵0")
+getgenv().bankLabel   = TargetBox:AddLabel("Bank: 🏦0")
+getgenv().dirtyLabel  = TargetBox:AddLabel("Dirty Cash: 💰0")
+getgenv().totalLabel  = TargetBox:AddLabel("Total: 💎0")
+
+getgenv().formatNumber = function(n)
+    n = tonumber(n) or 0
+    return tostring(n):reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")
+end
+
+task.spawn(function()
+    while task.wait(0.25) do
+        getgenv().plr = getgenv().SelectedPlayer
+        getgenv().stored = getgenv().plr and getgenv().plr:FindFirstChild("stored")
+        
+        if not getgenv().stored then
+            getgenv().cashLabel:SetText("Cash: 💵—")
+            getgenv().bankLabel:SetText("Bank: 🏦—")
+            getgenv().dirtyLabel:SetText("Dirty Cash: 💰—")
+            getgenv().totalLabel:SetText("Total: 💎—")
+        else
+            getgenv().cash  = getgenv().stored.Money and getgenv().stored.Money.Value or 0
+            getgenv().bank  = getgenv().stored.Bank and getgenv().stored.Bank.Value or 0
+            getgenv().dirty = getgenv().stored.FilthyStack and getgenv().stored.FilthyStack.Value or 0
+            getgenv().total = getgenv().cash + getgenv().bank + getgenv().dirty
+            
+            getgenv().cashLabel:SetText("Cash: 💵" .. getgenv().formatNumber(getgenv().cash))
+            getgenv().bankLabel:SetText("Bank: 🏦" .. getgenv().formatNumber(getgenv().bank))
+            getgenv().dirtyLabel:SetText("Dirty Cash: 💰" .. getgenv().formatNumber(getgenv().dirty))
+            getgenv().totalLabel:SetText("Total: 💎" .. getgenv().formatNumber(getgenv().total))
+        end
+    end
+end)
+
+TargetBox:AddButton('Kill Selected Player', function()
+    if getgenv().SelectedPlayer and getgenv().SelectedPlayer.Character then
+        getgenv().tool = getgenv().LocalPlayer.Character and getgenv().LocalPlayer.Character:FindFirstChildOfClass("Tool")
+        if getgenv().tool then
+            getgenv().kill_gun(getgenv().SelectedPlayer)
+        end
+    end
+end)
+
+TargetBox:AddButton('View Inventory', function()
+    if getgenv().SelectedPlayer and getgenv().SelectedPlayer:FindFirstChild("Backpack") then
+        getgenv().items = {}
+        for _, v in getgenv().SelectedPlayer.Backpack:GetChildren() do
+            table.insert(getgenv().items, v.Name)
+        end
+        if #getgenv().items > 0 then
+            Library:Notify("Backpack: " .. table.concat(getgenv().items, ", "), 8)
+        else
+            Library:Notify("Backpack empty", 6)
+        end
+    end
+end)
+
+TargetBox:AddButton('Goto Player', function()
+    getgenv().target = getgenv().SelectedPlayer
+    if not getgenv().target then return end
+    
+    getgenv().tchar = getgenv().target.Character
+    getgenv().thrp  = getgenv().tchar and getgenv().tchar:FindFirstChild("HumanoidRootPart")
+    
+    getgenv().lchar = getgenv().LocalPlayer.Character
+    getgenv().lhrp  = getgenv().lchar and getgenv().lchar:FindFirstChild("HumanoidRootPart")
+    getgenv().hum   = getgenv().lchar and getgenv().lchar:FindFirstChildOfClass("Humanoid")
+    
+    if getgenv().thrp and getgenv().lhrp and getgenv().hum then
+        getgenv().hum:ChangeState(0)
+        task.wait()
+        if not getgenv().LocalPlayer:GetAttribute("LastACPos") then
+            getgenv().lhrp.CFrame = getgenv().thrp.CFrame * CFrame.new(3, 0, 0)
+        end
+    end
+end)
+
+TargetBox:AddToggle('KillBring', {
+    Text = 'KillBring',
+    Default = false,
+}):OnChanged(function(value)
+    getgenv().killBringEnabled = value
+    if not value and getgenv().SelectedPlayer then
+        getgenv().id = getgenv().SelectedPlayer.UserId
+        getgenv().char = getgenv().SelectedPlayer.Character
+        if getgenv().char and getgenv().originalPositions[getgenv().id] then
+            getgenv().root = getgenv().char:FindFirstChild("HumanoidRootPart")
+            if getgenv().root then
+                getgenv().root.Anchored = false
+                getgenv().root.CFrame = getgenv().originalPositions[getgenv().id]
+                getgenv().originalPositions[getgenv().id] = nil
+            end
+        end
+    end
+end)
+
+task.spawn(function()
+    while task.wait(0.1) do
+        if not getgenv().killBringEnabled or not getgenv().SelectedPlayer then continue end
+        
+        getgenv().tchar = getgenv().SelectedPlayer.Character
+        getgenv().lchar = getgenv().LocalPlayer.Character
+        
+        if not (getgenv().tchar and getgenv().lchar) then continue end
+        
+        getgenv().troot = getgenv().tchar:FindFirstChild("HumanoidRootPart")
+        getgenv().lroot = getgenv().lchar:FindFirstChild("HumanoidRootPart")
+        getgenv().thum  = getgenv().tchar:FindFirstChildOfClass("Humanoid")
+        
+        if getgenv().troot and getgenv().lroot and getgenv().thum then
+            getgenv().id = getgenv().SelectedPlayer.UserId
+            if not getgenv().originalPositions[getgenv().id] then
+                getgenv().originalPositions[getgenv().id] = getgenv().troot.CFrame
+            end
+            
+            getgenv().troot.CFrame = getgenv().lroot.CFrame * CFrame.new(getgenv().lroot.CFrame.LookVector * 2 + Vector3.new(0, 0.3, 0))
+            getgenv().troot.Anchored = true
+            
+            getgenv().thum:ChangeState(Enum.HumanoidStateType.Physics)
+            task.wait(0.06)
+            getgenv().thum:ChangeState(Enum.HumanoidStateType.GettingUp)
+        end
+    end
+end)
+
+getgenv().SpectateEnabled = false
+getgenv().SpectateConnection = nil
+
+getgenv().updateSpectate = function()
+    if not getgenv().SpectateEnabled then return end
+    
+    if getgenv().SpectateConnection then
+        getgenv().SpectateConnection:Disconnect()
+        getgenv().SpectateConnection = nil
+    end
+    
+    getgenv().plr = getgenv().SelectedPlayer
+    if getgenv().plr and getgenv().plr.Character and getgenv().plr.Character:FindFirstChild("Humanoid") then
+        getgenv().Camera.CameraSubject = getgenv().plr.Character.Humanoid
+        getgenv().SpectateConnection = getgenv().plr.CharacterAdded:Connect(function(char)
+            getgenv().hum = char:WaitForChild("Humanoid", 8)
+            if getgenv().hum then
+                getgenv().Camera.CameraSubject = getgenv().hum
+            end
+        end)
+    end
+end
+
+TargetBox:AddToggle('SpectateToggle', {
+    Text = 'Spectate Player',
+    Default = false,
+}):OnChanged(function(value)
+    getgenv().SpectateEnabled = value
+    if value then
+        getgenv().updateSpectate()
+    else
+        if getgenv().LocalPlayer.Character and getgenv().LocalPlayer.Character:FindFirstChild("Humanoid") then
+            getgenv().Camera.CameraSubject = getgenv().LocalPlayer.Character.Humanoid
+        end
+        if getgenv().SpectateConnection then
+            getgenv().SpectateConnection:Disconnect()
+            getgenv().SpectateConnection = nil
+        end
+    end
+end)
+
+task.spawn(function()
+    getgenv().lastSpectateTarget = nil
+    while task.wait(0.2) do
+        if getgenv().SpectateEnabled and getgenv().SelectedPlayer ~= getgenv().lastSpectateTarget then
+            getgenv().lastSpectateTarget = getgenv().SelectedPlayer
+            getgenv().updateSpectate()
+        end
+    end
+end)
+
+getgenv().PhoneRemote = getgenv().ReplicatedStorage:WaitForChild("Resources", 5)
+    and getgenv().ReplicatedStorage.Resources:WaitForChild("#Phone", 5)
+    and getgenv().ReplicatedStorage.Resources["#Phone"]:WaitForChild("Main", 5)
+
+getgenv().SpamDMEnabled = false
+
+TargetBox:AddToggle("SpamMessageTarget", {
+    Text = "Kill Players FPS",
+    Default = false,
+}):OnChanged(function(value)
+    getgenv().SpamDMEnabled = value
+    
+    if value then
+        if not getgenv().SelectedPlayer or not getgenv().PhoneRemote then
+            getgenv().SpamDMEnabled = false
+            return
+        end
+        
+        task.spawn(function()
+            while getgenv().SpamDMEnabled do
+                pcall(function()
+                    getgenv().PhoneRemote:FireServer("Messaging", {
+                        "SentMessage",
+                        "###################################################################################",
+                        getgenv().SelectedPlayer
+                    })
+                end)
+                task.wait(0.0001)
+            end
+        end)
+    end
+end)
+
+
+getgenv().Players = game:GetService("Players")
+getgenv().LocalPlayer = Players.LocalPlayer
+
+getgenv().hitboxEnabled = false
+getgenv().hitboxSize = 15
+getgenv().hitboxPart = "Head"
+getgenv().hitboxModel = "Default"
+getgenv().Transparency = 0.5
+
+getgenv().ORIGINAL = {}
+getgenv().BOXES = {}
+
+getgenv().getPart = function(character)
+    if getgenv().hitboxPart == "Head" then
+        return character:FindFirstChild("Head")
+    else
+        return character:FindFirstChild("UpperTorso")
+            or character:FindFirstChild("Torso")
+            or character:FindFirstChild("HumanoidRootPart")
+    end
+end
+
+getgenv().saveOriginal = function(part)
+    if not getgenv().ORIGINAL[part] then
+        getgenv().ORIGINAL[part] = {
+            Size = part.Size,
+            Transparency = part.Transparency,
+            CanCollide = part.CanCollide,
+            Massless = part.Massless
+        }
+    end
+end
+
+getgenv().removeBox = function(part)
+    local box = getgenv().BOXES[part]
+    if box then
+        box:Destroy()
+        getgenv().BOXES[part] = nil
+    end
+end
+
+getgenv().restorePart = function(part)
+    getgenv().removeBox(part)
+    local data = getgenv().ORIGINAL[part]
+    if data and part then
+        part.Size = data.Size
+        part.Transparency = data.Transparency
+        part.CanCollide = data.CanCollide
+        part.Massless = data.Massless
+        getgenv().ORIGINAL[part] = nil
+    end
+end
+
+getgenv().restoreAll = function()
+    for part in pairs(getgenv().ORIGINAL) do
+        if part and part.Parent then
+            getgenv().restorePart(part)
+        end
+    end
+end
+
+getgenv().createBoxHitbox = function(part, size)
+    getgenv().removeBox(part)
+
+    local box = Instance.new("Part")
+    box.Size = Vector3.new(size, size, size)
+    box.Transparency = getgenv().Transparency
+    box.CanCollide = false
+    box.CanTouch = false
+    box.CanQuery = false
+    box.Massless = true
+    box.Anchored = false
+    box.Color = Color3.new(1, 0, 0)
+    box.Name = "HitboxBox"
+
+    local weld = Instance.new("WeldConstraint")
+    weld.Part0 = part
+    weld.Part1 = box
+    weld.Parent = box
+
+    box.CFrame = part.CFrame
+    box.Parent = part.Parent
+
+    getgenv().BOXES[part] = box
+
+    part.Transparency = 1
+    part.CanCollide = false
+end
+
+getgenv().ApplyHitbox = function(player)
+    if player == getgenv().LocalPlayer then return end
+
+    local function expand()
+        if not getgenv().hitboxEnabled then return end
+        local part = player.Character and getgenv().getPart(player.Character)
+        if part and part:IsA("BasePart") then
+            getgenv().saveOriginal(part)
+            local size = getgenv().hitboxSize * 2
+
+            if getgenv().hitboxModel == "Box" then
+                getgenv().createBoxHitbox(part, size)
+            else
+                getgenv().removeBox(part)
+                part.Transparency = getgenv().Transparency
+                part.Size = Vector3.new(size, size, size)
+                part.CanCollide = false
+                part.CanTouch = false
+                part.CanQuery = false
+                part.Massless = true
+            end
+        end
+    end
+
+    player.CharacterAppearanceLoaded:Connect(function()
+        task.wait(0.1)
+        expand()
+    end)
+
+    if player.Character then
+        expand()
+    end
+end
+
+getgenv().UpdateHitboxes = function()
+    getgenv().restoreAll()
+    if not getgenv().hitboxEnabled then return end
+    for _, player in ipairs(getgenv().Players:GetPlayers()) do
+        getgenv().ApplyHitbox(player)
+    end
+end
+
+LeftGroupBox:AddToggle('HitboxExpanderEnabled', {
+    Text = ' Hitbox Expander',
+    Default = false,
+    Callback = function(v)
+        getgenv().hitboxEnabled = v
+        getgenv().UpdateHitboxes()
+    end
+})
+
+LeftGroupBox:AddDropdown('HitboxPart', {
+    Values = { 'Head', 'Torso' },
+    Default = 1,
+    Multi = false,
+    Text = 'Part',
+    Callback = function(v)
+        getgenv().hitboxPart = v
+        getgenv().UpdateHitboxes()
+    end
+})
+
+
+LeftGroupBox:AddSlider('HitboxExpanderSize', {
+    Text = 'Hitbox Size',
+    Default = 5,
+    Min = 1,
+    Max = 20,
+    Rounding = 1,
+    Callback = function(v)
+        getgenv().hitboxSize = v
+        if getgenv().hitboxEnabled then
+            getgenv().UpdateHitboxes()
+        end
+    end
+})
+
+LeftGroupBox:AddSlider('HitboxTransparency', {
+    Text = 'Transparency',
+    Default = 0.5,
+    Min = 0,
+    Max = 1,
+    Rounding = 2,
+    Callback = function(v)
+        getgenv().Transparency = v
+        if getgenv().hitboxEnabled then
+            getgenv().UpdateHitboxes()
+        end
+    end
+})
+
+
+
+
+getgenv().Players.PlayerAdded:Connect(function(player)
+    if getgenv().hitboxEnabled then
+        getgenv().ApplyHitbox(player)
+    end
+end)
+
+getgenv().LocalPlayer.CharacterAdded:Connect(function()
+    getgenv().UpdateHitboxes()
+end)
+
+getgenv().UpdateHitboxes()
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+local MaxDistance = 10000
+
+local MasterGui = CoreGui:FindFirstChild("UnifiedESP") or Instance.new("ScreenGui")
+MasterGui.Name = "UnifiedESP"
+MasterGui.ResetOnSpawn = false
+MasterGui.Parent = CoreGui
+
+local Drawn = {}
+local Connections = {}
+
+local TextColor = Color3.fromRGB(255, 255, 255)
+
+local ESPColors = {
+    BoxCorner = Color3.fromRGB(255, 255, 255),
+    BoxFillSolid = Color3.fromRGB(0, 0, 0),
+    ChamsFill = Color3.fromRGB(119, 120, 255),
+    ChamsOutline = Color3.fromRGB(0, 0, 0)
+}
+
+local GradientColors = {
+    FullBoxFill = {Color1 = Color3.fromRGB(119, 120, 255), Color2 = Color3.fromRGB(0, 0, 0)},
+    FullBoxOutline = {Color1 = Color3.fromRGB(119, 120, 255), Color2 = Color3.fromRGB(0, 0, 0)},
+    Health = {Color1 = Color3.fromRGB(255, 0, 0), Color2 = Color3.fromRGB(0, 255, 0)}
+}
+
+local Toggles = {
+    Name = false,
+    Weapon = false,
+    Distance = false,
+    Health = false,
+    BoxCorner = false,
+    BoxFull = false,
+    Chams = false
+}
+
+local Settings = {
+    BoxCornerThickness = 1.5,
+    BoxFillTransparency = 0.75,
+    HealthWidth = 2.5,
+    ChamsFillTransparency = 0.80,
+    ChamsOutlineTransparency = 0.80,
+    FullBoxRotationSpeed = 180
+}
+
+local BoxObjects = {}
+local RotationAngles = {}
+local RotationLastTime = {}
+
+local function clearPlayer(name)
+    if Drawn[name] then
+        for _, v in ipairs(Drawn[name]) do
+            if typeof(v) == "Instance" then pcall(function() v:Destroy() end)
+            elseif typeof(v) == "RBXScriptConnection" then pcall(function() v:Disconnect() end) end
+        end
+        Drawn[name] = nil
+        BoxObjects[name] = nil
+        RotationAngles[name] = nil
+        RotationLastTime[name] = nil
+    end
+end
+
+local function Create(class, props)
+    local inst = Instance.new(class)
+    for k, v in pairs(props or {}) do inst[k] = v end
+    inst.Parent = MasterGui
+    return inst
+end
+
+local function CreateText()
+    return Create("TextLabel", {
+        BackgroundTransparency = 1,
+        Font = Enum.Font.Code,
+        TextSize = 14,
+        TextColor3 = TextColor,
+        TextStrokeTransparency = 0.7,
+        TextStrokeColor3 = Color3.new(0,0,0),
+        Size = UDim2.new(0, 260, 0, 20),
+        AnchorPoint = Vector2.new(0.5, 0),
+        ZIndex = 5,
+        Visible = false
+    })
+end
+
+local function makeCorners()
+    local corners = {}
+    for i = 1, 8 do
+        local f = Create("Frame", {
+            BackgroundColor3 = ESPColors.BoxCorner,
+            BorderSizePixel = 0,
+            ZIndex = 4,
+            Visible = false
+        })
+        table.insert(corners, f)
+    end
+    return corners
+end
+
+local function createHealthParts()
+    local outline = Create("Frame", {BackgroundColor3 = Color3.new(0,0,0), BorderSizePixel = 0, ZIndex = 1, Visible = false})
+    local back = Create("Frame", {BackgroundColor3 = Color3.fromRGB(35,35,35), BorderSizePixel = 0, ZIndex = 2, Visible = false})
+    local bar = Create("Frame", {BackgroundColor3 = Color3.new(1,1,1), BorderSizePixel = 0, ZIndex = 3, Visible = false})
+
+    local healthGrad = Instance.new("UIGradient")
+    healthGrad.Rotation = -90
+    healthGrad.Parent = bar
+
+    return outline, back, bar, healthGrad
+end
+
+local function applyChams(char, enabled)
+    if not char then return end
+    local old = char:FindFirstChild("ThermalHighlight")
+    if old then old:Destroy() end
+    if not enabled then return end
+    local h = Instance.new("Highlight")
+    h.Name = "ThermalHighlight"
+    h.Adornee = char
+    h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    h.FillColor = ESPColors.ChamsFill
+    h.FillTransparency = Settings.ChamsFillTransparency
+    h.OutlineTransparency = Settings.ChamsOutlineTransparency
+    h.OutlineColor = ESPColors.ChamsOutline
+    h.Parent = char
+end
+
+local function PlayerESP(plr)
+    if plr == LocalPlayer then return end
+    clearPlayer(plr.Name)
+    Drawn[plr.Name] = {}
+    RotationAngles[plr.Name] = 0
+    RotationLastTime[plr.Name] = tick()
+
+    local nameTxt = CreateText()
+    local weaponTxt = CreateText()
+    local distTxt = CreateText()
+    local corners = makeCorners()
+    local hOutline, hBack, hBar, healthGradient = createHealthParts()
+
+    local box = Create("Frame", {BorderSizePixel = 0, ZIndex = 2, Visible = false})
+    local boxGrad = Instance.new("UIGradient")
+    boxGrad.Rotation = -45
+    boxGrad.Parent = box
+
+    local boxStroke = Instance.new("UIStroke")
+    boxStroke.Transparency = 0
+    boxStroke.Thickness = 1
+    boxStroke.Parent = box
+
+    local boxStrokeGrad = Instance.new("UIGradient")
+    boxStrokeGrad.Rotation = -45
+    boxStrokeGrad.Parent = boxStroke
+
+    for _, obj in {nameTxt, weaponTxt, distTxt, hOutline, hBack, hBar, box} do
+        table.insert(Drawn[plr.Name], obj)
+    end
+    for _, c in ipairs(corners) do table.insert(Drawn[plr.Name], c) end
+
+    BoxObjects[plr.Name] = {box = box, grad = boxGrad, stroke = boxStroke, strokeGrad = boxStrokeGrad}
+
+    local function update()
+        local char = plr.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if not (char and root and hum and hum.Health > 0) then
+            for _, v in ipairs(Drawn[plr.Name]) do
+                if v and typeof(v) == "Instance" and v:IsA("GuiObject") then
+                    v.Visible = false
+                end
+            end
+            return
+        end
+
+        local screenPos, onScreen = Camera:WorldToScreenPoint(root.Position)
+        local dist = (Camera.CFrame.Position - root.Position).Magnitude
+        if not onScreen or screenPos.Z > MaxDistance or screenPos.Z < 1 then
+            for _, v in ipairs(Drawn[plr.Name]) do
+                if v and typeof(v) == "Instance" and v:IsA("GuiObject") then
+                    v.Visible = false
+                end
+            end
+            return
+        end
+
+        local scale = math.clamp(11.5 / (screenPos.Z * math.tan(math.rad(Camera.FieldOfView * 0.5))) * 100, 8, 600)
+        local w = 1.9 * scale
+        local h = 2.9 * scale
+        local centerX = screenPos.X
+        local topY = screenPos.Y - h / 2
+        local bottomY = screenPos.Y + h / 2
+        local textScale = math.clamp(1 / (dist * 0.003 + 0.5), 0.7, 1.4)
+
+        if Toggles.Name then
+            nameTxt.Text = plr.Name
+            nameTxt.Position = UDim2.new(0, centerX, 0, topY - 22 * textScale)
+            nameTxt.TextSize = math.floor(15 * textScale)
+            nameTxt.Visible = true
+        else
+            nameTxt.Visible = false
+        end
+
+        local nextY = bottomY + 6 * textScale
+        if Toggles.Weapon then
+            local tool = char:FindFirstChildOfClass("Tool")
+            weaponTxt.Text = tool and tool.Name or "None"
+            weaponTxt.Position = UDim2.new(0, centerX, 0, nextY)
+            weaponTxt.TextSize = math.floor(14 * textScale)
+            weaponTxt.Visible = true
+            nextY = nextY + 18 * textScale
+        else
+            weaponTxt.Visible = false
+        end
+
+        if Toggles.Distance then
+            distTxt.Text = math.floor(dist) .. " studs"
+            distTxt.Position = UDim2.new(0, centerX, 0, nextY)
+            distTxt.TextSize = math.floor(14 * textScale)
+            distTxt.Visible = true
+        else
+            distTxt.Visible = false
+        end
+
+        if Toggles.BoxFull then
+            local obj = BoxObjects[plr.Name]
+            obj.box.Position = UDim2.new(0, centerX - w/2, 0, topY)
+            obj.box.Size = UDim2.new(0, w, 0, h)
+            obj.box.Visible = true
+
+            obj.box.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            obj.box.BackgroundTransparency = Settings.BoxFillTransparency
+            obj.box.BorderSizePixel = 1
+
+            obj.grad.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, GradientColors.FullBoxFill.Color1),
+                ColorSequenceKeypoint.new(1, GradientColors.FullBoxFill.Color2)
+            }
+            obj.strokeGrad.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, GradientColors.FullBoxOutline.Color1),
+                ColorSequenceKeypoint.new(1, GradientColors.FullBoxOutline.Color2)
+            }
+
+            local now = tick()
+            local last = RotationLastTime[plr.Name] or now
+            local delta = now - last
+            RotationAngles[plr.Name] = (RotationAngles[plr.Name] + delta * Settings.FullBoxRotationSpeed) % 360
+            RotationLastTime[plr.Name] = now
+
+            obj.grad.Rotation = RotationAngles[plr.Name]
+            obj.strokeGrad.Rotation = RotationAngles[plr.Name]
+            obj.grad.Enabled = true
+            obj.strokeGrad.Enabled = true
+        else
+            if BoxObjects[plr.Name] then
+                BoxObjects[plr.Name].box.Visible = false
+            end
+        end
+
+        if Toggles.BoxCorner then
+            local arm = math.max(4, w * 0.22)
+            local thick = Settings.BoxCornerThickness
+            local positions = {
+                {centerX - w/2, topY, arm, thick},
+                {centerX - w/2, topY, thick, arm},
+                {centerX + w/2 - arm, topY, arm, thick},
+                {centerX + w/2 - thick, topY, thick, arm},
+                {centerX - w/2, bottomY - thick, arm, thick},
+                {centerX - w/2, bottomY - arm, thick, arm},
+                {centerX + w/2 - arm, bottomY - thick, arm, thick},
+                {centerX + w/2 - thick, bottomY - arm, thick, arm}
+            }
+
+            for i = 1, 8 do
+                local x,y,sx,sy = unpack(positions[i])
+                local f = corners[i]
+                f.Position = UDim2.new(0,x,0,y)
+                f.Size = UDim2.new(0,sx,0,sy)
+                f.Visible = true
+            end
+        else
+            for _, f in ipairs(corners) do f.Visible = false end
+        end
+
+        if Toggles.Health then
+            local hp = math.clamp(hum.Health / hum.MaxHealth, 0, 1)
+            local fillH = h * hp
+            local barX = centerX - w / 2 - 8
+            local barY = topY
+
+            hOutline.Position = UDim2.new(0, barX - 1, 0, barY - 1)
+            hOutline.Size = UDim2.new(0, Settings.HealthWidth + 2, 0, h + 2)
+            hBack.Position = UDim2.new(0, barX, 0, barY)
+            hBack.Size = UDim2.new(0, Settings.HealthWidth, 0, h)
+            hBar.Position = UDim2.new(0, barX, 0, barY + h - fillH)
+            hBar.Size = UDim2.new(0, Settings.HealthWidth, 0, fillH)
+
+            healthGradient.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, GradientColors.Health.Color1),
+                ColorSequenceKeypoint.new(1, GradientColors.Health.Color2)
+            }
+            healthGradient.Enabled = true
+
+            hBar.Visible = true
+            hOutline.Visible = true
+            hBack.Visible = true
+        else
+            hOutline.Visible = false
+            hBack.Visible = false
+            hBar.Visible = false
+            healthGradient.Enabled = false
+        end
+    end
+
+    local renderConn = RunService.RenderStepped:Connect(update)
+    table.insert(Drawn[plr.Name], renderConn)
+    table.insert(Connections, renderConn)
+
+    local charAddedConn = plr.CharacterAdded:Connect(function(c)
+        task.wait(0.1)
+        if Toggles.Chams then applyChams(c, true) end
+        update()
+    end)
+    table.insert(Drawn[plr.Name], charAddedConn)
+    table.insert(Connections, charAddedConn)
+
+    if plr.Character and Toggles.Chams then applyChams(plr.Character, true) end
+end
+
+Players.PlayerRemoving:Connect(clearPlayer)
+for _, p in ipairs(Players:GetPlayers()) do task.spawn(PlayerESP, p) end
+Players.PlayerAdded:Connect(function(p) task.spawn(PlayerESP, p) end)
+
+if ESPGroupbox then
+    ESPGroupbox:AddToggle("NameESP", {Text = "Name", Default = false, Callback = function(v) Toggles.Name = v end})
+
+    ESPGroupbox:AddToggle("WeaponESP", {Text = "Item", Default = false, Callback = function(v) Toggles.Weapon = v end})
+
+    ESPGroupbox:AddToggle("DistanceESP", {Text = "Distance", Default = false, Callback = function(v) Toggles.Distance = v end})
+
+    ESPGroupbox:AddToggle("HealthESP", {Text = "Health Bar", Default = false, Callback = function(v) Toggles.Health = v end})
+        :AddColorPicker("HealthLow", {Default = GradientColors.Health.Color1, Callback = function(c) GradientColors.Health.Color1 = c end})
+        :AddColorPicker("HealthHigh", {Default = GradientColors.Health.Color2, Callback = function(c) GradientColors.Health.Color2 = c end})
+
+    ESPGroupbox:AddToggle("BoxCornerESP", {Text = "Corner Box", Default = false, Callback = function(v) Toggles.BoxCorner = v end})
+        :AddColorPicker("CornerColor", {Default = ESPColors.BoxCorner, Callback = function(c) ESPColors.BoxCorner = c end})
+
+    ESPGroupbox:AddToggle("BoxFullESP", {Text = "Fill Box", Default = false, Callback = function(v) Toggles.BoxFull = v end})
+        :AddColorPicker("FillGradient1", {Default = GradientColors.FullBoxFill.Color1, Callback = function(c) GradientColors.FullBoxFill.Color1 = c end})
+        :AddColorPicker("FillGradient2", {Default = GradientColors.FullBoxFill.Color2, Callback = function(c) GradientColors.FullBoxFill.Color2 = c end})
+        :AddColorPicker("OutlineGradient1", {Default = GradientColors.FullBoxOutline.Color1, Callback = function(c) GradientColors.FullBoxOutline.Color1 = c end})
+        :AddColorPicker("OutlineGradient2", {Default = GradientColors.FullBoxOutline.Color2, Callback = function(c) GradientColors.FullBoxOutline.Color2 = c end})
+
+    ESPGroupbox:AddToggle("ChamsESP", {Text = "Chams", Default = false, Callback = function(v)
+        Toggles.Chams = v
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= LocalPlayer and p.Character then applyChams(p.Character, v) end
+        end
+    end})
+        :AddColorPicker("ChamsFill", {Default = ESPColors.ChamsFill, Callback = function(c) ESPColors.ChamsFill = c end})
+        :AddColorPicker("ChamsOutline", {Default = ESPColors.ChamsOutline, Callback = function(c) ESPColors.ChamsOutline = c end})
+end
+
+
+getgenv().Players = game:GetService("Players")
+getgenv().RunService = game:GetService("RunService")
+getgenv().LocalPlayer = getgenv().Players.LocalPlayer
+
+getgenv().PlayerChamsEnabled = false
+getgenv().PlayerChamsRainbow = false
+getgenv().PlayerChamsColor = Color3.fromRGB(0,255,255)
+getgenv().PlayerChamsTransparency = 0.25
+getgenv().PlayerMaterial = "ForceField"
+getgenv().PlayerAnim = "Static"
+
+getgenv().GunChamsEnabled = false
+
+getgenv().PlayerOriginal = {}
+getgenv().GunOriginal = {}
+getgenv().CurrentTool = nil
+
+getgenv().PatternSpeed = 3
+
+local function PatternValue(part, mode)
+    local t = tick() * getgenv().PatternSpeed
+    if mode == "Static" then
+        return 1
+    elseif mode == "Wave" then
+        return (math.sin(t + part.Position.X * 0.2 + part.Position.Y * 0.2) + 1) * 0.5
+    elseif mode == "Pulse" then
+        return (math.sin(t * 2) + 1) * 0.5
+    elseif mode == "Noise" then
+        return (math.noise(part.Position.X * 0.1, part.Position.Y * 0.1, t * 0.5) + 1) * 0.5
+    elseif mode == "Lightning" then
+        return math.abs(math.sin(t * 12 + part.Position.X)) * 0.8 + 0.2
+    elseif mode == "Scanline" then
+        return math.clamp(math.sin(t + part.Position.Y * 0.5) * 1.2, 0, 1)
+    elseif mode == "Grid" then
+        local gx = math.abs(math.sin(part.Position.X * 0.3 + t * 1.5))
+        local gy = math.abs(math.sin(part.Position.Y * 0.3 + t * 1.5))
+        return (gx + gy) * 0.5
+    end
+    return 1
+end
+
+local function ShouldCham(part)
+    if not part:IsA("BasePart") then return false end
+    if part.Name == "HumanoidRootPart" then return false end
+    if part.Parent:IsA("Accessory") then return false end
+    return true
+end
+
+local function ApplyChams(char, orig, material, anim, color, trans)
+    for _, part in ipairs(char:GetDescendants()) do
+        if ShouldCham(part) then
+            if not orig[part] then
+                orig[part] = {Material = part.Material, Color = part.Color, Transparency = part.Transparency}
+            end
+            local p = PatternValue(part, anim)
+            pcall(function()
+                part.Material = Enum.Material[material]
+                part.Color = Color3.new(color.R * p, color.G * p, color.B * p)
+                part.Transparency = trans
+            end)
+        end
+    end
+end
+
+local function ResetChams(orig)
+    for part, data in pairs(orig) do
+        if part and part.Parent then
+            pcall(function()
+                part.Material = data.Material
+                part.Color = data.Color
+                part.Transparency = data.Transparency
+            end)
+        end
+    end
+    orig = {}
+end
+
+local function ApplyPlayer()
+    if not getgenv().PlayerChamsEnabled or not getgenv().LocalPlayer.Character then return end
+    local c = getgenv().PlayerChamsRainbow and Color3.fromHSV((tick() % 5) / 5, 1, 1) or getgenv().PlayerChamsColor
+    ApplyChams(getgenv().LocalPlayer.Character, getgenv().PlayerOriginal, getgenv().PlayerMaterial, getgenv().PlayerAnim, c, getgenv().PlayerChamsTransparency)
+end
+
+local function ApplyGun()
+    if not getgenv().GunChamsEnabled or not getgenv().PlayerChamsEnabled or not getgenv().CurrentTool then return end
+    local c = getgenv().PlayerChamsRainbow and Color3.fromHSV((tick() % 5) / 5, 1, 1) or getgenv().PlayerChamsColor
+    ApplyChams(getgenv().CurrentTool, getgenv().GunOriginal, getgenv().PlayerMaterial, getgenv().PlayerAnim, c, getgenv().PlayerChamsTransparency)
+end
+
+local function HookTool(tool)
+    if not tool:IsA("Tool") then return end
+    tool.Equipped:Connect(function()
+        getgenv().CurrentTool = tool
+        ApplyGun()
+    end)
+    tool.Unequipped:Connect(function()
+        if getgenv().CurrentTool == tool then
+            ResetChams(getgenv().GunOriginal)
+            getgenv().CurrentTool = nil
+        end
+    end)
+end
+
+local function HookCharacter(char)
+    char.ChildAdded:Connect(HookTool)
+    for _, c in ipairs(char:GetChildren()) do HookTool(c) end
+    task.wait(0.3)
+    ApplyPlayer()
+end
+
+if getgenv().LocalPlayer.Character then HookCharacter(getgenv().LocalPlayer.Character) end
+getgenv().LocalPlayer.CharacterAdded:Connect(HookCharacter)
+
+Tab1:AddToggle("PlayerChams", {
+    Text = "Enable Player Chams",
+    Default = getgenv().PlayerChamsEnabled,
+    Callback = function(v)
+        getgenv().PlayerChamsEnabled = v
+        if v then ApplyPlayer() else ResetChams(getgenv().PlayerOriginal) end
+    end
+}):AddColorPicker("PlayerChamsColorPicker", {
+    Default = getgenv().PlayerChamsColor,
+    Callback = function(v)
+        getgenv().PlayerChamsColor = v
+    end
+})
+
+Tab1:AddToggle("PlayerRainbow", {
+    Text = "Rainbow",
+    Default = getgenv().PlayerChamsRainbow,
+    Callback = function(v)
+        getgenv().PlayerChamsRainbow = v
+    end
+})
+
+Tab1:AddDropdown("PlayerMaterialDropdown", {
+    Values = {"ForceField", "Neon"},
+    Default = getgenv().PlayerMaterial,
+    Callback = function(v)
+        getgenv().PlayerMaterial = v
+    end
+})
+
+Tab1:AddDropdown("PlayerAnimationDropdown", {
+    Values = {"Static", "Wave", "Pulse", "Noise", "Lightning", "Scanline", "Grid"},
+    Default = getgenv().PlayerAnim,
+    Callback = function(v)
+        getgenv().PlayerAnim = v
+    end
+})
+
+getgenv().RunService.RenderStepped:Connect(function()
+    if getgenv().PlayerChamsEnabled then ApplyPlayer() end
+    if getgenv().GunChamsEnabled then ApplyGun() end
+end)
+
+
+
+
+local Players = cloneref(game:GetService("Players"))
+local RunService = cloneref(game:GetService("RunService"))
+local UserInputService = cloneref(game:GetService("UserInputService"))
+local ProximityPromptService = cloneref(game:GetService("ProximityPromptService"))
+local ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"))
+local Lighting = cloneref(game:GetService("Lighting"))
+local Workspace = cloneref(game:GetService("Workspace"))
+local LocalPlayer = Players.LocalPlayer
+
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+
+local ModFlags = {
+    InfiniteHunger      = false,
+    InfiniteStamina     = false,
+    InfiniteSleep       = false,
+    DisableCameraBobbing = false,
+    DisableBloodEffects = false,
+    NoFallDamage        = false,
+    NoJumpCooldown      = false,
+    DisableCameras      = false,
+    NoKnockback         = false,
+    RespawnWhereYouDied = false,
+    InfiniteJump        = false,
+    Fullbright          = false,
+    Noclip              = false,
+    QuickRespawn        = false,
+    BypassLockedCars    = false,
+}
+
+local DeathFrame = nil
+local OriginalSettings = {}
+local SeatConnection = nil
+
+local function enableFullbright()
+    if not next(OriginalSettings) then
+        OriginalSettings.Brightness     = Lighting.Brightness
+        OriginalSettings.ClockTime      = Lighting.ClockTime
+        OriginalSettings.FogEnd         = Lighting.FogEnd
+        OriginalSettings.GlobalShadows  = Lighting.GlobalShadows
+        OriginalSettings.OutdoorAmbient = Lighting.OutdoorAmbient
+    end
+    Lighting.Brightness     = 2
+    Lighting.ClockTime      = 12
+    Lighting.FogEnd         = 1e5
+    Lighting.GlobalShadows  = false
+    Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
+end
+
+local function disableFullbright()
+    for prop, val in pairs(OriginalSettings) do
+        Lighting[prop] = val
+    end
+end
+
+local function findVehicleSeat(obj)
+    while obj and obj.Parent do
+        if obj:FindFirstChild("DriveSeat") then
+            return obj.DriveSeat
+        end
+        obj = obj.Parent
+    end
+    return nil
+end
+
+local function SetupCharacterEvents(char)
+    local hum = char:WaitForChild("Humanoid")
+    local root = char:WaitForChild("HumanoidRootPart")
+
+    hum.Died:Connect(function()
+        DeathFrame = root.CFrame
+    end)
+
+    char.DescendantAdded:Connect(function(desc)
+        if ModFlags.NoKnockback and (desc:IsA("BodyVelocity") or desc:IsA("LinearVelocity") or desc:IsA("VectorForce")) then
+            task.wait()
+            desc:Destroy()
+        end
+    end)
+
+    task.delay(0.1, function()
+        if ModFlags.RespawnWhereYouDied and typeof(DeathFrame) == "CFrame" and root and root.Parent then
+            root.CFrame = DeathFrame
+        end
+    end)
+end
+
+if Character then SetupCharacterEvents(Character) end
+LocalPlayer.CharacterAdded:Connect(SetupCharacterEvents)
+
+RunService.RenderStepped:Connect(function()
+    local char = LocalPlayer.Character
+    local gui = LocalPlayer:FindFirstChild("PlayerGui")
+
+    if gui then
+        pcall(function()
+            local hungerGui = gui:FindFirstChild("Hunger", true)
+            if hungerGui then
+                local script = hungerGui:FindFirstChild("HungerBarScript", true)
+                if script then
+                    script.Disabled = ModFlags.InfiniteHunger
+                end
+            end
+        end)
+
+        pcall(function()
+            local runGui = gui:FindFirstChild("Run", true)
+            if runGui then
+                local script = runGui:FindFirstChild("StaminaBarScript", true)
+                if script then
+                    script.Disabled = ModFlags.InfiniteStamina
+                end
+            end
+        end)
+
+        pcall(function()
+            local sleepGui = gui:FindFirstChild("SleepGui", true)
+            if sleepGui then
+                local script = sleepGui:FindFirstChild("sleepScript", true)
+                if script then
+                    script.Disabled = ModFlags.InfiniteSleep
+                end
+            end
+        end)
+
+        pcall(function()
+            local bloodGui = gui:FindFirstChild("BloodGui")
+            if bloodGui then
+                bloodGui.Enabled = not ModFlags.DisableBloodEffects
+            end
+        end)
+
+        pcall(function()
+            local camTexts = gui:FindFirstChild("CameraTexts")
+            if camTexts then
+                camTexts.Enabled = not ModFlags.DisableCameras
+                local ls = camTexts:FindFirstChild("LocalScript")
+                if ls then
+                    ls.Disabled = ModFlags.DisableCameras
+                end
+            end
+        end)
+
+        pcall(function()
+            local jumpDebounce = gui:FindFirstChild("JumpDebounce")
+            if jumpDebounce then
+                local ls = jumpDebounce:FindFirstChild("LocalScript")
+                if ls then
+                    ls.Disabled = ModFlags.NoJumpCooldown
+                end
+            end
+        end)
+    end
+
+    if char then
+        pcall(function()
+            local camBob = char:FindFirstChild("CameraBobbing")
+            if camBob then camBob.Disabled = ModFlags.DisableCameraBobbing end
+        end)
+
+        pcall(function()
+            local fallDamage = char:FindFirstChild("FallDamageRagdoll")
+            if fallDamage then fallDamage.Disabled = ModFlags.NoFallDamage end
+        end)
+    end
+
+    if ModFlags.Fullbright then
+        enableFullbright()
+    else
+        disableFullbright()
+    end
+end)
+
+UserInputService.InputBegan:Connect(function(input, gp)
+    if gp or not ModFlags.InfiniteJump then return end
+    if input.KeyCode == Enum.KeyCode.Space then
+        local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
+        if hum and hum.Health > 0 then
+            hum:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+task.spawn(function()
+    while task.wait(0.1) do
+        if not ModFlags.QuickRespawn then continue end
+        local char = LocalPlayer.Character
+        local hum = char and char:FindFirstChild("Humanoid")
+        if hum and hum.Health <= 0 then
+            local respawnRE = ReplicatedStorage:FindFirstChild("RespawnRE", true)
+            if respawnRE then
+                respawnRE:FireServer()
+            end
+            task.wait(0.1)
+        end
+    end
+end)
+
+
+ExtraBox:AddToggle('InfiniteHunger', {
+    Text = 'Infinite Hunger',
+    Default = false,
+    Callback = function(v) ModFlags.InfiniteHunger = v end,
+})
+
+ExtraBox:AddToggle('InfiniteStamina', {
+    Text = 'Infinite Stamina',
+    Default = false,
+    Callback = function(v) ModFlags.InfiniteStamina = v end,
+})
+
+ExtraBox:AddToggle('InfiniteSleep', {
+    Text = 'Infinite Sleep',
+    Default = false,
+    Callback = function(v) ModFlags.InfiniteSleep = v end,
+})
+
+ExtraBox:AddToggle('InfiniteJump', {
+    Text = 'Infinite Jump',
+    Default = false,
+    Callback = function(v) ModFlags.InfiniteJump = v end,
+})
+
+
+
+ExtraBox:AddToggle('BypassLockedCars', {
+    Text = 'Bypass Locked Cars',
+    Default = false,
+    Callback = function(state)
+        ModFlags.BypassLockedCars = state
+        if state then
+            SeatConnection = ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt, playerWhoTriggered)
+                if playerWhoTriggered ~= LocalPlayer or not ModFlags.BypassLockedCars then return end
+                local seat = findVehicleSeat(prompt.Parent)
+                if not seat then return end
+                local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                local humanoid = character:WaitForChild("Humanoid")
+                if seat:IsA("VehicleSeat") then
+                    seat:Sit(humanoid)
+                else
+                    humanoid.Sit = false
+                    humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                    task.wait()
+                    seat:Sit(humanoid)
+                end
+            end)
+        else
+            if SeatConnection then
+                SeatConnection:Disconnect()
+                SeatConnection = nil
+            end
+        end
+    end,
+})
+
+
+
+
+
+ExtraBox:AddToggle('DisableCameraBobbing', {
+    Text = 'Disable Camera Bobbing',
+    Default = false,
+    Callback = function(v) ModFlags.DisableCameraBobbing = v end,
+})
+
+ExtraBox:AddToggle('DisableBloodEffects', {
+    Text = 'Disable Blood Effects',
+    Default = false,
+    Callback = function(v) ModFlags.DisableBloodEffects = v end,
+})
+
+ExtraBox:AddToggle('NoFallDamage', {
+    Text = 'No Fall Damage',
+    Default = false,
+    Callback = function(v) ModFlags.NoFallDamage = v end,
+})
+
+
+
+ExtraBox:AddToggle('DisableCameras', {
+    Text = 'Disable Security Cameras',
+    Default = false,
+    Callback = function(v) ModFlags.DisableCameras = v end,
+})
+
+ExtraBox:AddToggle('NoKnockback', {
+    Text = 'No Knockback',
+    Default = false,
+    Callback = function(v) ModFlags.NoKnockback = v end,
+})
+
+ExtraBox:AddToggle('RespawnWhereYouDied', {
+    Text = 'Respawn Where You Died',
+    Default = false,
+    Callback = function(v) ModFlags.RespawnWhereYouDied = v end,
+})
+
+
+
+ExtraBox:AddToggle('Fullbright', {
+    Text = 'Fullbright',
+    Default = false,
+    Callback = function(v) ModFlags.Fullbright = v end,
+})
+
+
+
+ExtraBox:AddToggle('QuickRespawn', {
+    Text = 'Quick Respawn',
+    Default = false,
+    Callback = function(v) ModFlags.QuickRespawn = v end,
+})
+
+getgenv().ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"))
+getgenv().Players = cloneref(game:GetService("Players"))
+getgenv().Player = Players.LocalPlayer
+getgenv().Character = nil
+getgenv().Backpack = nil
+
+getgenv().BLACKLIST = {
+    ["Fist"] = true,
+    ["Phone"] = true,
+}
+
+getgenv().Enabled = false
+getgenv().Processing = false
+getgenv().CachedTools = {}
+getgenv().ListedIds = {}
+
+getgenv().UpdateCharacter = function()
+    Character = Player.Character or Player.CharacterAdded:Wait()
+    Backpack = Player:WaitForChild("Backpack")
+end
+
+UpdateCharacter()
+Player.CharacterAdded:Connect(UpdateCharacter)
+
+getgenv().CacheInventory = function()
+    if not Enabled or Processing then return end
+    local tools = {}
+    for _, v in ipairs(Backpack:GetChildren()) do
+        if v:IsA("Tool") and not BLACKLIST[v.Name] then
+            tools[v.Name] = true
+        end
+    end
+    if Character then
+        for _, v in ipairs(Character:GetChildren()) do
+            if v:IsA("Tool") and not BLACKLIST[v.Name] then
+                tools[v.Name] = true
+            end
+        end
+    end
+    CachedTools = {}
+    for name in pairs(tools) do
+        table.insert(CachedTools, name)
+    end
+    table.sort(CachedTools)
+end
+
+task.spawn(function()
+    while true do
+        CacheInventory()
+        task.wait(1)
+    end
+end)
+
+getgenv().CaptureListedIds = function()
+    ListedIds = {}
+    for _, item in ipairs(ReplicatedStorage.MarketItems:GetChildren()) do
+        local owner = item:FindFirstChild("owner")
+        if owner and owner.Value == Player.Name and not BLACKLIST[item.Name] then
+            local id = item:GetAttribute("SpecialId")
+            if id then
+                ListedIds[id] = item.Name
+            end
+        end
+    end
+end
+
+getgenv().IsListed = function(toolName)
+    for _, item in ipairs(ReplicatedStorage.MarketItems:GetChildren()) do
+        local owner = item:FindFirstChild("owner")
+        if owner and owner.Value == Player.Name and item.Name == toolName then
+            return true
+        end
+    end
+    return false
+end
+
+getgenv().ListUntilDone = function()
+    local listed = {}
+    while true do
+        local allDone = true
+        for _, name in ipairs(CachedTools) do
+            if not listed[name] and not IsListed(name) then
+                ReplicatedStorage.ListWeaponRemote:FireServer(name, 990000)
+                task.wait(1.8)
+                if IsListed(name) then
+                    listed[name] = true
+                else
+                    allDone = false
+                end
+            end
+        end
+        if allDone then break end
+        task.wait(0.5)
+    end
+    task.wait(2)
+    CaptureListedIds()
+end
+
+getgenv().OnCharacter = function(char)
+    local humanoid = char:WaitForChild("Humanoid")
+    humanoid.Died:Connect(function()
+        if not Enabled or Processing then return end
+        Processing = true
+        
+
+        ListUntilDone()
+        
+
+        Player.CharacterAdded:Wait()
+        
+
+        task.wait(8)
+        
+
+        local maxAttempts = 15
+        local attempt = 0
+        
+        while attempt < maxAttempts do
+            attempt = attempt + 1
+            
+            CaptureListedIds()
+            
+            if next(ListedIds) == nil then
+    
+                break
+            end
+            
+         
+            for id, name in pairs(ListedIds) do
+                ReplicatedStorage.BuyItemRemote:FireServer(name, "Remove", id)
+                task.wait(2)  
+            end
+            
+
+            task.wait(3)  
+        end
+        
+        Processing = false
+    end)
+end
+
+OnCharacter(Character)
+Player.CharacterAdded:Connect(OnCharacter)
+
+ExtraBox:AddToggle('AutoListOnDeath', {
+    Text = 'Keep Inventory',
+    Default = false,
+    Callback = function(v)
+        Enabled = v
+    end
+})
+getgenv().autoDrop = false
+getgenv().dropAmount = 10000
+
+getgenv().autoDropLoop = function()
+    while getgenv().autoDrop do
+        getgenv().ReplicatedStorage.BankProcessRemote:InvokeServer("Drop", tostring(getgenv().dropAmount))
+        task.wait(0.25)
+    end
+end
+
+getgenv().DropAmountInput = DropBox:AddInput('DropAmount', {
+    Text = 'Drop Amount',
+    Default = '10000',
+    Numeric = true,
+    Tooltip = 'How much money to auto drop',
+})
+
+getgenv().DropAmountInput:OnChanged(function(value)
+    local num = tonumber(value)
+    if num then
+        getgenv().dropAmount = num
+    end
+end)
+
+getgenv().AutoDropToggle = DropBox:AddToggle('AutoDrop', {
+    Text = 'Auto Drop',
+    Default = false,
+})
+
+getgenv().AutoDropToggle:OnChanged(function(state)
+    getgenv().autoDrop = state
+    if state then
+        task.spawn(getgenv().autoDropLoop)
+    end
+end)
+
+getgenv().autoDepo = false
+getgenv().depoAmount = 30000
+getgenv().autoWithd = false
+getgenv().withdAmount = 90000
+getgenv().BankAction = getgenv().ReplicatedStorage.BankAction
+
+getgenv().autoDepositLoop = function()
+    while getgenv().autoDepo do
+        getgenv().BankAction:FireServer('depo', getgenv().depoAmount)
+        task.wait(3)
+    end
+end
+
+getgenv().autoWithdrawLoop = function()
+    while getgenv().autoWithd do
+        getgenv().BankAction:FireServer('with', getgenv().withdAmount)
+        task.wait(3)
+    end
+end
+
+getgenv().DepositAmountInput = BankBox:AddInput('DepositAmount', {
+    Text = 'Deposit Amount',
+    Default = '30000',
+    Numeric = true,
+    Tooltip = 'How much money to auto deposit',
+})
+
+getgenv().DepositAmountInput:OnChanged(function(value)
+    local num = tonumber(value)
+    if num then
+        getgenv().depoAmount = num
+    end
+end)
+
+getgenv().AutoDepositToggle = BankBox:AddToggle('AutoDeposit', {
+    Text = 'Auto Deposit',
+    Default = false,
+})
+
+getgenv().AutoDepositToggle:OnChanged(function(state)
+    getgenv().autoDepo = state
+    if state then
+        task.spawn(getgenv().autoDepositLoop)
+    end
+end)
+
+getgenv().WithdrawAmountInput = BankBox:AddInput('WithdrawAmount', {
+    Text = 'Withdraw Amount',
+    Default = '90000',
+    Numeric = true,
+    Tooltip = 'How much money to auto withdraw',
+})
+
+getgenv().WithdrawAmountInput:OnChanged(function(value)
+    local num = tonumber(value)
+    if num then
+        getgenv().withdAmount = num
+    end
+end)
+
+getgenv().AutoWithdrawToggle = BankBox:AddToggle('AutoWithdraw', {
+    Text = 'Auto Withdraw',
+    Default = false,
+})
+
+getgenv().AutoWithdrawToggle:OnChanged(function(state)
+    getgenv().autoWithd = state
+    if state then
+        task.spawn(getgenv().autoWithdrawLoop)
+    end
+end)
+
+
+
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local moveConnection
+local stayUpEnabled = false
+
+local function keepUpright()
+	local char = player.Character
+	if char then
+		local hrp = char:FindFirstChild("HumanoidRootPart")
+		if hrp then
+			hrp.AssemblyLinearVelocity = Vector3.zero
+			hrp.AssemblyAngularVelocity = Vector3.zero
+			hrp.CFrame = CFrame.new(
+				hrp.Position,
+				hrp.Position + Vector3.new(hrp.CFrame.LookVector.X, 0, hrp.CFrame.LookVector.Z)
+			)
+		end
+	end
+end
+
+local function startStayUp()
+	if moveConnection then moveConnection:Disconnect() end
+	moveConnection = RunService.Heartbeat:Connect(function()
+		if stayUpEnabled then
+			keepUpright()
+		end
+	end)
+end
+
+local function stopStayUp()
+	if moveConnection then
+		moveConnection:Disconnect()
+		moveConnection = nil
+	end
+end
+
+
+
+local StayUpToggle = ExtraBox1:AddToggle('StayUpToggle', {
+	Text = 'Disable Falling Over',
+	Default = false,
+	Tooltip = 'Keeps you upright',
+})
+
+StayUpToggle:OnChanged(function(value)
+	stayUpEnabled = value
+	if value then
+		startStayUp()
+	else
+		stopStayUp()
+	end
+end)
+
+
+
+
+ExtraBox1:AddButton("Teleport to Bank", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-202.7586, 283.6267, -1222.1841)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+ExtraBox1:AddButton("Teleport to Cash Wash", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-987.11, 253.72, -685.13)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+ExtraBox1:AddButton("Teleport to Penthouse", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-163, 397, -594)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+ExtraBox1:AddButton("Teleport to Apartment", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-613.7843, 356.4939, -689.0292)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+ExtraBox1:AddButton("Teleport to Gunshop 1", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(93004, 122099, 17250)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+ExtraBox1:AddButton("Teleport to Gunshop 2", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(66192.45, 123615.71, 5744.736)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+ExtraBox1:AddButton("Teleport to Gunshop 3", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(72426.18, 128855.64, -1081.063)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+ExtraBox1:AddButton("Teleport to Dealership", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-385.97, 253.41, -1236.36)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+ExtraBox1:AddButton("Teleport to Backpack", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-670.86, 253.60, -682.25)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+ExtraBox1:AddButton("Teleport to Market", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-388.34, 340.34, -562.64)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+ExtraBox1:AddButton("Teleport to Abandonded($$$)", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-733.03, 286.94, -779.16)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+ExtraBox1:AddButton("Teleport to Studio($$$)", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(93426.23 + 2, 14484.71, 561.80)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+ExtraBox1:AddButton("Teleport to House 1", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-698, 264, -924)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+ExtraBox1:AddButton("Teleport to House 2", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-647, 256, -485)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+ExtraBox1:AddButton("Teleport to Hospital", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1590.83, 254.27, 18.92)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+ExtraBox1:AddButton("Teleport to Dollar Central", function()
+    FadeIn(0.3)
+    task.wait(0.6)
+    LocalPlayer.Character.Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-413, 254, -1059)
+    task.wait(2)
+    FadeOut(0.4)
+end)
+
+
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+
+getgenv().LocalPlayer = Players.LocalPlayer
+getgenv().Camera = Workspace.CurrentCamera
+
+getgenv().Character = getgenv().LocalPlayer.Character or getgenv().LocalPlayer.CharacterAdded:Wait()
+getgenv().LocalPlayer.CharacterAdded:Connect(function(newChar)
+    getgenv().Character = newChar
+end)
+
+getgenv().flySpeed = 50
+getgenv().FLYING = false
+getgenv().SwimMethod = false
+getgenv().CFloop = nil
+getgenv().RemovedHair = {}
+
+RunService.Stepped:Connect(function()
+    if getgenv().SwimMethod and getgenv().Character then
+        local hum = getgenv().Character:FindFirstChildOfClass("Humanoid")
+        if hum then hum:ChangeState(Enum.HumanoidStateType.FallingDown) end
+    end
+end)
+
+WalkGroupbox:AddToggle('FlyToggle', {
+    Text = 'Fly',
+    Default = false,
+    Callback = function(state)
+        getgenv().FLYING = state
+        local camera = workspace.CurrentCamera
+        if state then
+            getgenv().SwimMethod = true
+            task.wait(0.3)
+            local char = getgenv().LocalPlayer.Character or getgenv().LocalPlayer.CharacterAdded:Wait()
+            local hum = char and char:FindFirstChild("Humanoid")
+            if not hum then return end
+            hum.PlatformStand = true
+            local Head = char:WaitForChild("Head")
+            Head.Anchored = true
+            getgenv().RemovedHair = {}
+            for _, acc in ipairs(char:GetChildren()) do
+                if acc:IsA("Accessory") then
+                    local h = acc:FindFirstChild("Handle")
+                    if h then
+                        local m = h:FindFirstChildOfClass("SpecialMesh")
+                        if m and (m.MeshId:lower():find("hair") or acc.Name:lower():find("hair")) then
+                            getgenv().RemovedHair[acc] = true
+                            acc.Parent = nil
+                        end
+                    elseif acc.Name:lower():find("hair") then
+                        getgenv().RemovedHair[acc] = true
+                        acc.Parent = nil
+                    end
+                end
+            end
+            camera.CameraSubject = Head
+            camera.CameraType = Enum.CameraType.Custom
+            getgenv().LocalPlayer.CameraMinZoomDistance = 0.5
+            getgenv().LocalPlayer.CameraMaxZoomDistance = 0.5
+            if getgenv().CFloop then getgenv().CFloop:Disconnect() end
+            getgenv().CFloop = RunService.Heartbeat:Connect(function(dt)
+                local move = hum.MoveDirection * (getgenv().flySpeed * dt)
+                local hcf = Head.CFrame
+                local ccf = camera.CFrame
+                local off = hcf:ToObjectSpace(ccf).Position
+                ccf = ccf * CFrame.new(-off.X, -off.Y, -off.Z + 1)
+                local cp = ccf.Position
+                local hp = hcf.Position
+                local vel = CFrame.new(cp, Vector3.new(hp.X, cp.Y, hp.Z)):VectorToObjectSpace(move)
+                Head.CFrame = CFrame.new(hp) * (ccf - cp) * CFrame.new(vel)
+                camera.CameraSubject = Head
+                getgenv().LocalPlayer.CameraMinZoomDistance = 0.1
+                getgenv().LocalPlayer.CameraMaxZoomDistance = 0.1
+            end)
+        else
+            if getgenv().CFloop then getgenv().CFloop:Disconnect() getgenv().CFloop = nil end
+            local char = getgenv().LocalPlayer.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            if hum then hum.PlatformStand = false end
+            local Head = char and char:FindFirstChild("Head")
+            if Head then Head.Anchored = false end
+            getgenv().SwimMethod = false
+            if hum then hum:ChangeState(Enum.HumanoidStateType.Running) end
+            getgenv().LocalPlayer.CameraMinZoomDistance = 0.5
+            getgenv().LocalPlayer.CameraMaxZoomDistance = 400
+            for acc in pairs(getgenv().RemovedHair) do
+                if char and not acc.Parent then acc.Parent = char end
+            end
+            getgenv().RemovedHair = {}
+        end
+    end,
+}):AddKeyPicker('FlyBind', {
+    Default = '',
+    SyncToggleState = true,
+    Mode = 'Toggle',
+    Text = 'Fly',
+    NoUI = false,
+    Toggle = 'FlyToggle'
+})
+
+WalkGroupbox:AddSlider('FlySpeedSlider', {
+    Text = 'Speed',
+    Min = 1,
+    Max = 200,
+    Default = 50,
+    Rounding = 1,
+    Callback = function(v)
+        getgenv().flySpeed = v
+    end,
+})
+
+getgenv().CarFlyEnabled = false
+getgenv().CarFlySpeed = 100
+getgenv().FLYING = false
+getgenv().CONTROL = {F=0,B=0,L=0,R=0,Q=0,E=0}
+getgenv().OriginalCollisions = {}
+getgenv().Platform = nil
+getgenv().PlatformWeld = nil
+getgenv().FlyBV = nil
+getgenv().FlyBG = nil
+getgenv().VehicleModel = nil
+getgenv().VehiclePart = nil
+getgenv().CarFlyConnection = nil
+
+local function getVehicle()
+    local hum = getgenv().Character and getgenv().Character:FindFirstChildOfClass("Humanoid")
+    if hum and hum.SeatPart and hum.SeatPart:IsA("VehicleSeat") then
+        local m = hum.SeatPart:FindFirstAncestorOfClass("Model")
+        return m, m and (m.PrimaryPart or hum.SeatPart)
+    end
+end
+
+local function setCollisions(model, enable)
+    if not model then return end
+    for _, p in ipairs(model:GetDescendants()) do
+        if p:IsA("BasePart") then
+            if enable then
+                if getgenv().OriginalCollisions[p] ~= nil then
+                    p.CanCollide = getgenv().OriginalCollisions[p]
+                    getgenv().OriginalCollisions[p] = nil
+                end
+            else
+                if getgenv().OriginalCollisions[p] == nil then
+                    getgenv().OriginalCollisions[p] = p.CanCollide
+                    p.CanCollide = false
+                end
+            end
+        end
+    end
+end
+
+local function startCarFly()
+    if getgenv().FLYING then return end
+    getgenv().VehicleModel, getgenv().VehiclePart = getVehicle()
+    if not getgenv().VehiclePart then return end
+    getgenv().FLYING = true
+    setCollisions(getgenv().VehicleModel, false)
+    getgenv().Platform = Instance.new("Part")
+    getgenv().Platform.Size = Vector3.new(8, 1, 12)
+    getgenv().Platform.CFrame = getgenv().VehiclePart.CFrame * CFrame.new(0, -getgenv().VehiclePart.Size.Y/2 - 1, 0)
+    getgenv().Platform.CanCollide = false
+    getgenv().Platform.Transparency = 1
+    getgenv().Platform.Massless = true
+    getgenv().Platform.Parent = Workspace
+    getgenv().PlatformWeld = Instance.new("WeldConstraint")
+    getgenv().PlatformWeld.Part0 = getgenv().Platform
+    getgenv().PlatformWeld.Part1 = getgenv().VehicleModel.PrimaryPart or getgenv().VehiclePart
+    getgenv().PlatformWeld.Parent = getgenv().Platform
+    getgenv().FlyBV = Instance.new("BodyVelocity", getgenv().Platform)
+    getgenv().FlyBV.MaxForce = Vector3.new(9e9,9e9,9e9)
+    getgenv().FlyBV.P = 12500
+    getgenv().FlyBG = Instance.new("BodyGyro", getgenv().Platform)
+    getgenv().FlyBG.MaxTorque = Vector3.new(9e9,9e9,9e9)
+    getgenv().FlyBG.P = 90000
+    getgenv().FlyBG.D = 3000
+    getgenv().FlyBG.CFrame = getgenv().Platform.CFrame
+    getgenv().CarFlyConnection = RunService.RenderStepped:Connect(function()
+        if not getgenv().FLYING or not getgenv().Platform or not getgenv().VehiclePart then return end
+        local mv = Vector3.zero
+        if getgenv().CONTROL.F ~= 0 then mv += getgenv().Camera.CFrame.LookVector * getgenv().CONTROL.F end
+        if getgenv().CONTROL.B ~= 0 then mv -= getgenv().Camera.CFrame.LookVector * getgenv().CONTROL.B end
+        if getgenv().CONTROL.L ~= 0 then mv -= getgenv().Camera.CFrame.RightVector * getgenv().CONTROL.L end
+        if getgenv().CONTROL.R ~= 0 then mv += getgenv().Camera.CFrame.RightVector * getgenv().CONTROL.R end
+        if getgenv().CONTROL.E ~= 0 then mv += getgenv().Camera.CFrame.UpVector * getgenv().CONTROL.E end
+        if getgenv().CONTROL.Q ~= 0 then mv -= getgenv().Camera.CFrame.UpVector * getgenv().CONTROL.Q end
+        getgenv().FlyBV.Velocity = mv.Magnitude > 0 and mv.Unit * getgenv().CarFlySpeed or Vector3.zero
+        getgenv().FlyBG.CFrame = CFrame.new(getgenv().Platform.Position, getgenv().Platform.Position + getgenv().Camera.CFrame.LookVector)
+    end)
+end
+
+local function stopCarFly()
+    getgenv().FLYING = false
+    if getgenv().CarFlyConnection then getgenv().CarFlyConnection:Disconnect() end
+    if getgenv().FlyBV then getgenv().FlyBV:Destroy() end
+    if getgenv().FlyBG then getgenv().FlyBG:Destroy() end
+    if getgenv().PlatformWeld then getgenv().PlatformWeld:Destroy() end
+    if getgenv().Platform then getgenv().Platform:Destroy() end
+    if getgenv().VehicleModel then setCollisions(getgenv().VehicleModel, true) end
+end
+
+UserInputService.InputBegan:Connect(function(i,g)
+    if g then return end
+    if i.KeyCode == Enum.KeyCode.W then getgenv().CONTROL.F = 1
+    elseif i.KeyCode == Enum.KeyCode.S then getgenv().CONTROL.B = 1
+    elseif i.KeyCode == Enum.KeyCode.A then getgenv().CONTROL.L = 1
+    elseif i.KeyCode == Enum.KeyCode.D then getgenv().CONTROL.R = 1
+    elseif i.KeyCode == Enum.KeyCode.E then getgenv().CONTROL.E = 1
+    elseif i.KeyCode == Enum.KeyCode.Q then getgenv().CONTROL.Q = 1
+    elseif i.KeyCode == Enum.KeyCode.F then
+        getgenv().CarFlyEnabled = not getgenv().CarFlyEnabled
+        if getgenv().CarFlyEnabled then startCarFly() else stopCarFly() end
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(i,g)
+    if g then return end
+    if i.KeyCode == Enum.KeyCode.W then getgenv().CONTROL.F = 0
+    elseif i.KeyCode == Enum.KeyCode.S then getgenv().CONTROL.B = 0
+    elseif i.KeyCode == Enum.KeyCode.A then getgenv().CONTROL.L = 0
+    elseif i.KeyCode == Enum.KeyCode.D then getgenv().CONTROL.R = 0
+    elseif i.KeyCode == Enum.KeyCode.E then getgenv().CONTROL.E = 0
+    elseif i.KeyCode == Enum.KeyCode.Q then getgenv().CONTROL.Q = 0 end
+end)
+
+getgenv().moveConnection = nil
+getgenv().movementEnabled = false
+getgenv().currentWalkSpeed = 16
+getgenv().fastFallSpeed = -200
+
+local function getHumanoid()
+    local c = getgenv().LocalPlayer.Character
+    if c then return c:FindFirstChildOfClass("Humanoid") end
+end
+
+local function keepUpright()
+    local c = getgenv().LocalPlayer.Character
+    if not c then return end
+    local hrp = c:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    hrp.RotVelocity = Vector3.zero
+    hrp.CFrame = CFrame.new(hrp.Position, hrp.Position + Vector3.new(hrp.CFrame.LookVector.X, 0, hrp.CFrame.LookVector.Z))
+end
+
+local function isGrounded(hrp)
+    local rp = RaycastParams.new()
+    rp.FilterDescendantsInstances = {getgenv().LocalPlayer.Character}
+    rp.FilterType = Enum.RaycastFilterType.Blacklist
+    return Workspace:Raycast(hrp.Position, Vector3.new(0,-6,0), rp) ~= nil
+end
+
+local function teleportForward(dist)
+    local c = getgenv().LocalPlayer.Character
+    if not c then return end
+    local hrp = c:FindFirstChild("HumanoidRootPart")
+    local h = c:FindFirstChildOfClass("Humanoid")
+    if not hrp or not h then return end
+    h:ChangeState(0)
+    repeat task.wait() until not getgenv().LocalPlayer:GetAttribute("LastACPos")
+    local origin = hrp.Position
+    local dir = hrp.CFrame.LookVector * dist
+    local rp = RaycastParams.new()
+    rp.FilterDescendantsInstances = {c}
+    rp.FilterType = Enum.RaycastFilterType.Blacklist
+    local rc = Workspace:Raycast(origin, dir, rp)
+    local pos = rc and (rc.Position - hrp.CFrame.LookVector * 2) or (origin + dir)
+    if not isGrounded(hrp) then
+        hrp.Velocity = Vector3.new(hrp.Velocity.X, getgenv().fastFallSpeed, hrp.Velocity.Z)
+    else
+        hrp.Velocity = Vector3.zero
+    end
+    hrp.CFrame = CFrame.new(pos, pos + hrp.CFrame.LookVector)
+    keepUpright()
+end
+
+local function startWalkLoop()
+    if getgenv().moveConnection then getgenv().moveConnection:Disconnect() end
+    getgenv().moveConnection = RunService.Heartbeat:Connect(function(dt)
+        if getgenv().movementEnabled then
+            local h = getHumanoid()
+            if h then
+                keepUpright()
+                if h.MoveDirection.Magnitude > 0 then
+                    teleportForward(getgenv().currentWalkSpeed * dt)
+                else
+                    local hrp = getgenv().LocalPlayer.Character and getgenv().LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    if hrp and not isGrounded(hrp) then
+                        hrp.Velocity = Vector3.new(hrp.Velocity.X, getgenv().fastFallSpeed, hrp.Velocity.Z)
+                    end
+                end
+            end
+        end
+    end)
+end
+
+local function stopWalkLoop()
+    if getgenv().moveConnection then getgenv().moveConnection:Disconnect() end
+    keepUpright()
+end
+
+WalkGroupbox:AddToggle('CarFlyToggle', {
+    Text = 'Car Fly',
+    Default = false,
+    Callback = function(v)
+        getgenv().CarFlyEnabled = v
+        if v then startCarFly() else stopCarFly() end
+    end
+}):AddKeyPicker('CarFlyKeybind', {
+    Default = '',
+    SyncToggleState = false,
+    Mode = 'Toggle',
+    Text = 'Car Fly Keybind',
+    NoUI = false,
+    Callback = function()
+        getgenv().CarFlyEnabled = not getgenv().CarFlyEnabled
+        if getgenv().CarFlyEnabled then startCarFly() else stopCarFly() end
+    end
+})
+
+WalkGroupbox:AddSlider('CarFlySpeed', {
+    Text = 'Speed',
+    Default = 100,
+    Min = 20,
+    Max = 300,
+    Rounding = 1,
+    Callback = function(value)
+        getgenv().CarFlySpeed = value
+    end
+})
+
+WalkGroupbox:AddToggle('WalkSpeedToggle', {
+    Text = 'WalkSpeed',
+    Default = false,
+}):OnChanged(function(value)
+    getgenv().movementEnabled = value
+    if value then startWalkLoop() else stopWalkLoop() end
+end)
+
+WalkGroupbox:AddSlider('WalkSpeedSlider', {
+    Text = 'Speed',
+    Default = 16,
+    Min = 10,
+    Max = 100,
+    Rounding = 0,
+}):OnChanged(function(value)
+    getgenv().currentWalkSpeed = value
+end)
+
+getgenv().RunService = game:GetService("RunService")
+getgenv().Players = game:GetService("Players")
+getgenv().LocalPlayer = getgenv().Players.LocalPlayer
+
+getgenv().StudioFarmConnections = getgenv().StudioFarmConnections or {}
+getgenv().FreeFallLoop = nil
+getgenv().SwimMethod = false
+
+getgenv().UpdateCharacterReferences = function()
+    getgenv().Character = getgenv().LocalPlayer.Character or getgenv().LocalPlayer.CharacterAdded:Wait()
+    getgenv().Humanoid = getgenv().Character:WaitForChild("Humanoid")
+    getgenv().HumanoidRootPart = getgenv().Character:WaitForChild("HumanoidRootPart")
+end
+
+getgenv().UpdateCharacterReferences()
+
+if not getgenv().StudioFarmConnections["CharacterAdded"] then
+    getgenv().StudioFarmConnections["CharacterAdded"] =
+        getgenv().LocalPlayer.CharacterAdded:Connect(function()
+            getgenv().UpdateCharacterReferences()
+        end)
+end
+
+getgenv().UpdateFreeFall = function(state)
+    if state then
+        getgenv().SwimMethod = true
+
+        if not getgenv().FreeFallLoop then
+            getgenv().FreeFallLoop = getgenv().RunService.Heartbeat:Connect(function()
+                if getgenv().Humanoid then
+                    getgenv().Humanoid:ChangeState(Enum.HumanoidStateType.FallingDown)
+                end
+            end)
+        end
+    else
+        getgenv().SwimMethod = false
+
+        if getgenv().FreeFallLoop then
+            getgenv().FreeFallLoop:Disconnect()
+            getgenv().FreeFallLoop = nil
+        end
+
+        if getgenv().Humanoid then
+            getgenv().Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+        end
+    end
+end
+
+getgenv().TeleportTo = function(cf)
+    if getgenv().LocalPlayer.Character and getgenv().LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        getgenv().LocalPlayer.Character.HumanoidRootPart.CFrame = cf
+    end
+end
+
+getgenv().RobStudio = function(studioPay)
+    getgenv().Character = getgenv().LocalPlayer.Character or getgenv().LocalPlayer.CharacterAdded:Wait()
+    getgenv().RootPart = getgenv().Character:FindFirstChild("HumanoidRootPart")
+    if not getgenv().RootPart then return end
+
+    getgenv().OldCFrameStudio = getgenv().RootPart.CFrame
+
+    getgenv().StudioPath = workspace.StudioPay.Money:FindFirstChild(studioPay)
+    getgenv().Prompt =
+        getgenv().StudioPath
+        and getgenv().StudioPath:FindFirstChild("StudioMoney1")
+        and getgenv().StudioPath.StudioMoney1:FindFirstChild("Prompt")
+
+    if getgenv().Prompt then
+        getgenv().TeleportTo(getgenv().Prompt.Parent.CFrame + Vector3.new(0,2,0))
+        task.wait(0.1)
+
+        getgenv().Prompt.HoldDuration = 0
+        getgenv().Prompt.RequiresLineOfSight = false
+
+        pcall(function()
+            fireproximityprompt(getgenv().Prompt, 0)
+        end)
+    end
+
+    task.wait(0.5)
+    getgenv().TeleportTo(getgenv().OldCFrameStudio)
+end
+
+FarmsBox:AddButton("Studio Farm", function()
+    FadeIn(0.3)
+
+    getgenv().UpdateFreeFall(true)
+    task.wait(2)
+
+    for _, pay in ipairs({"StudioPay1","StudioPay2","StudioPay3"}) do
+        getgenv().RobStudio(pay)
+    end
+
+    task.wait(1)
+    getgenv().UpdateFreeFall(false)
+
+    getgenv().Character = getgenv().LocalPlayer.Character or getgenv().LocalPlayer.CharacterAdded:Wait()
+    getgenv().RootPart = getgenv().Character:FindFirstChild("HumanoidRootPart")
+
+    if getgenv().RootPart then
+        getgenv().TeleportTo(getgenv().RootPart.CFrame)
+    end
+
+    FadeOut(0.4)
+end)
+
+
+
+
+
+GUIsBox:AddButton('Open Trunk', function()
+    local playerGui = game:GetService('Players').LocalPlayer.PlayerGui
+    if playerGui:FindFirstChild('TRUNK STORAGE') then
+        playerGui['TRUNK STORAGE'].Enabled = true
+    else
+        Library:Notify('Trunk Storage GUI not found', 3)
+    end
+end)
+
+GUIsBox:AddButton('Tattoo Shop', function()
+    local playerGui = game:GetService('Players').LocalPlayer.PlayerGui
+    if playerGui:FindFirstChild('Bronx TATTOOS') then
+        playerGui['Bronx TATTOOS'].Enabled = true
+    else
+        Library:Notify('Bronx Tattoo GUI not found', 3)
+    end
+end)
+
+GUIsBox:AddButton('Bronx Market', function()
+    local Players = game:GetService('Players')
+    local playerGui = Players.LocalPlayer and Players.LocalPlayer:FindFirstChild('PlayerGui')
+    if playerGui and playerGui:FindFirstChild('Bronx Market 2') then
+        playerGui['Bronx Market 2'].Enabled = true
+    else
+        Library:Notify('Bronx Market GUI not found', 3)
+    end
+end)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+QuickShopLeftGroup:AddButton('Buy Shiesty $ 25', function()
+    getgenv().ReplicatedStorage.ShopRemote:InvokeServer('Shiesty')
+end)
+
+QuickShopLeftGroup:AddButton('Buy BluGloves $ 10', function()
+    getgenv().ReplicatedStorage.ShopRemote:InvokeServer('BluGloves')
+end)
+
+QuickShopLeftGroup:AddButton('Buy WhiteGloves $ 10', function()
+    getgenv().ReplicatedStorage.ShopRemote:InvokeServer('WhiteGloves')
+end)
+
+QuickShopLeftGroup:AddButton('Buy BlackGloves $ 10', function()
+    getgenv().ReplicatedStorage.ShopRemote:InvokeServer('BlackGloves')
+end)
+
+QuickShopLeftGroup:AddButton('Buy Water $ 10 ', function()
+    getgenv().ReplicatedStorage.ShopRemote:InvokeServer('Water')
+end)
+
+
+QuickShopLeftGroup:AddButton('Buy Bandage $ 350', function()
+    getgenv().ReplicatedStorage.ShopRemote2:InvokeServer('Bandage')
+end)
+
+
+
+QuickShopRightGroup:AddButton('Buy IceFruit Bag $ 2,500', function()
+    getgenv().ReplicatedStorage.ExoticShopRemote:InvokeServer('Ice-Fruit Bag')
+end)
+
+
+QuickShopRightGroup:AddButton('Buy Fiji Water $ 48', function()
+    getgenv().ReplicatedStorage.ExoticShopRemote:InvokeServer('FijiWater')
+end)
+
+QuickShopRightGroup:AddButton('Buy IceFruit Cupz $ 150', function()
+    getgenv().ReplicatedStorage.ExoticShopRemote:InvokeServer('Ice-Fruit Cupz')
+end)
+
+QuickShopRightGroup:AddButton('Buy Fresh Water $ 48', function()
+    getgenv().ReplicatedStorage.ExoticShopRemote:InvokeServer('FreshWater')
+end)
+
+QuickShopRightGroup:AddButton('Buy Lemonade $ 500', function()
+    getgenv().ReplicatedStorage.ExoticShopRemote:InvokeServer('Lemonade')
+end)
+
+QuickShopRightGroup:AddButton('Buy Fake Card $ 700', function()
+    getgenv().ReplicatedStorage.ExoticShopRemote:InvokeServer('FakeCard')
+end)
+
+
+
+
+
+Bckpack:AddButton("Buy Drac Bag $ 700", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+
+    local OriginalCFrame = Root.CFrame
+
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+
+    Root.CFrame = CFrame.new(-694, 254, -690)
+
+    task.wait(0.5)
+
+    local prompt = workspace:WaitForChild("GUNS")
+        :WaitForChild("Drac Bag")
+        :WaitForChild("bullet ejector")
+        :WaitForChild("BuyPrompt")
+
+    fireproximityprompt(prompt)
+
+    task.wait(0.5)
+
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+
+    Root.CFrame = OriginalCFrame
+end)
+
+
+
+Bckpack:AddButton("Buy Designer Bag $ 2,000", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+
+    local OriginalCFrame = Root.CFrame
+
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+
+    Root.CFrame = CFrame.new(-687, 254, -693)
+
+    task.wait(0.5)
+
+    local prompt = workspace:WaitForChild("GUNS")
+        :WaitForChild("DesignerBag")
+        :WaitForChild("bullet ejector")
+        :WaitForChild("BuyPrompt")
+
+    fireproximityprompt(prompt)
+
+    task.wait(0.5)
+
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+
+    Root.CFrame = OriginalCFrame
+end)
+
+
+
+
+
+Bckpack:AddButton("Buy Elite Bag $ 500", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+
+    local OriginalCFrame = Root.CFrame
+
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+
+    Root.CFrame = CFrame.new(-699, 254, -691)
+
+    task.wait(0.5)
+
+    local prompt = workspace:WaitForChild("GUNS")
+        :WaitForChild("BagElite")
+        :WaitForChild("bullet ejector")
+        :WaitForChild("BuyPrompt")
+
+    fireproximityprompt(prompt)
+
+    task.wait(0.5)
+
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+
+    Root.CFrame = OriginalCFrame
+end)
+
+
+
+
+
+
+
+
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Remote = ReplicatedStorage:WaitForChild("Resources"):WaitForChild("#Phone"):WaitForChild("Main")
+
+getgenv().SpamTweet = false
+
+local SpamThread
+
+Cars1:AddToggle("SpamTweetToggle", {
+    Text = "Server Lagger",
+    Default = false,
+    Callback = function(Value)
+        getgenv().SpamTweet = Value
+
+        if Value then
+            SpamThread = task.spawn(function()
+                while getgenv().SpamTweet do
+                    local args = {
+                        [1] = "Tweet",
+                        [2] = {
+                            [1] = "CreateTweet",
+                            [2] = "###################################################################################"
+                        }
+                    }
+
+                    Remote:FireServer(unpack(args))
+                    task.wait(0.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001)
+                end
+            end)
+        end
+    end
+})
+
+
+
+Cars1:AddButton("Explode All Cars [ Hold Gun ]", function()
+    local LocalPlayer = game.Players.LocalPlayer
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local gun = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildWhichIsA("Tool")
+
+
+
+    local civCars = workspace:FindFirstChild("CivCars")
+    if not civCars then return end
+
+
+    local count = 0
+    for _, car in ipairs(civCars:GetChildren()) do
+        if car:IsA("Model") then
+            count += 1
+            task.spawn(function()
+                local success, part = pcall(function()
+                    return car:FindFirstChildWhichIsA("BasePart") or car.PrimaryPart
+                end)
+                if not success or not part then return end
+
+                for i = 1, 4000 do
+                    pcall(function()
+                        ReplicatedStorage.InflictCar:InvokeServer(
+                            gun,
+                            car,
+                            part,
+                            9e50
+                        )
+                    end)
+                end
+            end)
+        end
+    end
+
+
+end)
+
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local CivCars = workspace:WaitForChild("CivCars")
+
+
+local lastCarIndex = 0
+
+local function findVehicleSeat(obj)
+    while obj and obj.Parent do
+        if obj:FindFirstChild("DriveSeat") then
+            return obj.DriveSeat
+        end
+        obj = obj.Parent
+    end
+end
+
+local function getNextEmptyCar()
+    local cars = CivCars:GetChildren()
+    local numCars = #cars
+    if numCars == 0 then return nil end
+
+    for i = 1, numCars do
+        -- Loop in rotation
+        local index = ((lastCarIndex + i - 1) % numCars) + 1
+        local car = cars[index]
+        local seat = findVehicleSeat(car)
+        if seat and not seat.Occupant then
+            lastCarIndex = index 
+            return seat
+        end
+    end
+    return nil 
+end
+
+local function teleportToSeat(seat)
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local root = character:WaitForChild("HumanoidRootPart")
+    root.CFrame = seat.CFrame + Vector3.new(0, 5, 0) 
+end
+
+local function sitInSeat(seat)
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+
+    if seat:IsA("VehicleSeat") then
+        seat:Sit(humanoid)
+    else
+        humanoid.Sit = false
+        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        task.wait()
+        seat:Sit(humanoid)
+    end
+end
+
+Cars1:AddButton("Steal Random Car", function()
+    local seat = getNextEmptyCar()
+    if not seat then
+        warn("No empty cars available!")
+        return
+    end
+
+    teleportToSeat(seat)
+    task.wait(0.1)
+    sitInSeat(seat)
+end)
+
+
+
+
+
+
+
+
+gunshop:AddButton("Buy Urban Extended $ 4,000", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+    local OriginalCFrame = Root.CFrame
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = CFrame.new(92988, 122099, 17239)
+    task.wait(0.5)
+    local prompt = workspace:WaitForChild("GUNS")
+        :WaitForChild("UrbanDefilerExt")
+        :WaitForChild("Base")
+        :WaitForChild("BuyPrompt")
+    fireproximityprompt(prompt)
+    task.wait(0.5)
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = OriginalCFrame
+end)
+
+
+gunshop:AddButton("Buy Infinity Extended $ 6,000", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+    local OriginalCFrame = Root.CFrame
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = CFrame.new(92983, 122099, 17246)
+    task.wait(0.5)
+    local prompt = workspace:WaitForChild("GUNS")
+        :WaitForChild(".45 InfinityExt")
+        :WaitForChild("Infinity (Edited)")
+        :WaitForChild("Trigger")
+        :WaitForChild("BuyPrompt")
+    fireproximityprompt(prompt)
+    task.wait(0.5)
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = OriginalCFrame
+end)
+
+
+
+
+gunshop:AddButton("Buy Spring Field Extended $ 5,000", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+    local OriginalCFrame = Root.CFrame
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = CFrame.new(92980, 122099, 17246)
+    task.wait(0.5)
+    local prompt = workspace:WaitForChild("GUNS")
+        :WaitForChild("SpringFieldExt")
+        :WaitForChild("xd_slide")
+        :WaitForChild("BuyPrompt")
+    fireproximityprompt(prompt)
+    task.wait(0.5)
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = OriginalCFrame
+end)
+
+
+
+
+gunshop:AddButton("Buy Spring Field XD $ 5,000", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+    local OriginalCFrame = Root.CFrame
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = CFrame.new(92977, 122099, 17246)
+    task.wait(0.5)
+    local prompt = workspace.GUNS:GetChildren()[329]
+        :WaitForChild("Combined_Springfield_XD")
+        :WaitForChild("SM_Springfield_XD")
+        :WaitForChild("BuyPrompt")
+    fireproximityprompt(prompt)
+    task.wait(0.5)
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = OriginalCFrame
+end)
+
+
+gunshop:AddButton("Buy S&W Ruger $ 800", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+    local OriginalCFrame = Root.CFrame
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = CFrame.new(93001, 122099, 17239)
+    task.wait(0.5)
+    local prompt = workspace:WaitForChild("GUNS")
+        :WaitForChild("S&W Ruger")
+        :WaitForChild("Casing 5")
+        :WaitForChild("BuyPrompt")
+    fireproximityprompt(prompt)
+    task.wait(0.5)
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = OriginalCFrame
+end)
+
+gunshop:AddButton("Buy Mac-11 $ 8,000", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+    local OriginalCFrame = Root.CFrame
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = CFrame.new(93017, 122099, 17246)
+    task.wait(0.5)
+    local prompt = workspace:WaitForChild("GUNS")
+        :WaitForChild("Mac-11")
+        :WaitForChild("23")
+        :WaitForChild("BuyPrompt")
+    fireproximityprompt(prompt)
+    task.wait(0.5)
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = OriginalCFrame
+end)
+
+
+gunshop:AddButton("Buy Draco $ 9,000", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+    local OriginalCFrame = Root.CFrame
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = CFrame.new(66196, 123616, 5746)
+    task.wait(0.5)
+    local prompt = workspace:WaitForChild("GUNS")
+        :GetChildren()[229]
+        :WaitForChild("Selector")
+        :WaitForChild("BuyPrompt")
+    fireproximityprompt(prompt)
+    task.wait(0.5)
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = OriginalCFrame
+end)
+
+
+gunshop:AddButton("Buy ARPistol $ 9,000", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+    local OriginalCFrame = Root.CFrame
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = CFrame.new(66194, 123616, 5742)
+    task.wait(0.5)
+    local prompt = workspace:WaitForChild("GUNS")
+        :GetChildren()[34]
+        :WaitForChild("dd")
+        :WaitForChild("BuyPrompt")
+    fireproximityprompt(prompt)
+    task.wait(0.5)
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = OriginalCFrame
+end)
+
+
+
+ammos:AddButton("Buy 5.56 $ 20", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+    local OriginalCFrame = Root.CFrame
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = CFrame.new(66193, 123616, 5730)
+    task.wait(0.5)
+    local prompt = workspace:WaitForChild("GUNS")
+        :GetChildren()[107]
+        :GetChildren()[9]
+        :WaitForChild("BuyPrompt")
+    fireproximityprompt(prompt)
+    task.wait(0.5)
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = OriginalCFrame
+end)
+
+
+ammos:AddButton("Buy .9mm $ 20", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+    local OriginalCFrame = Root.CFrame
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = CFrame.new(66193, 123616, 5731)
+    task.wait(0.5)
+    local prompt = workspace:WaitForChild("GUNS")
+        :GetChildren()[67]
+        :GetChildren()[12]
+        :WaitForChild("BuyPrompt")
+    fireproximityprompt(prompt)
+    task.wait(0.5)
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = OriginalCFrame
+end)
+
+
+
+ammos:AddButton("Buy .Extended $ 20", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+    local OriginalCFrame = Root.CFrame
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = CFrame.new(66193, 123616, 5733)
+    task.wait(0.5)
+    local prompt = workspace:WaitForChild("GUNS")
+        :GetChildren()[263]
+        :WaitForChild(".Extended")
+        :GetChildren()[10]
+        :WaitForChild("BuyPrompt")
+    fireproximityprompt(prompt)
+    task.wait(0.5)
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = OriginalCFrame
+end)
+
+
+
+ammos:AddButton("Buy .FNMag $ 20", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+    local OriginalCFrame = Root.CFrame
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = CFrame.new(66192, 123616, 5734)
+    task.wait(0.5)
+    local prompt = workspace:WaitForChild("GUNS")
+        :GetChildren()[221]
+        :WaitForChild("Model")
+        :WaitForChild("Sign")
+        :WaitForChild("BuyPrompt")
+    fireproximityprompt(prompt)
+    task.wait(0.5)
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = OriginalCFrame
+end)
+
+
+
+ammos:AddButton("Buy .MacMag $ 20", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+    local OriginalCFrame = Root.CFrame
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = CFrame.new(66192, 123616, 5736)
+    task.wait(0.5)
+    local prompt = workspace:WaitForChild("GUNS")
+        :WaitForChild(".MacMag")
+        :WaitForChild("Mag")
+        :WaitForChild("BuyPrompt")
+    fireproximityprompt(prompt)
+    task.wait(0.5)
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = OriginalCFrame
+end)
+
+
+
+ammos:AddButton("Buy .TecMag $ 20", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+    local OriginalCFrame = Root.CFrame
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = CFrame.new(66192, 123616, 5737)
+    task.wait(0.5)
+    local prompt = workspace:WaitForChild("GUNS")
+        :GetChildren()[165]
+        :GetChildren()[12]
+        :WaitForChild("BuyPrompt")
+    fireproximityprompt(prompt)
+    task.wait(0.5)
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = OriginalCFrame
+end)
+
+ammos:AddButton("Buy .UziMag $ 20", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+    local OriginalCFrame = Root.CFrame
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = CFrame.new(66192, 123616, 5738)
+    task.wait(0.5)
+    local prompt = workspace:WaitForChild("GUNS")
+        :WaitForChild(".UziMag")
+        :WaitForChild(".UziMag")
+        :GetChildren()[13]
+        :WaitForChild("BuyPrompt")
+    fireproximityprompt(prompt)
+    task.wait(0.5)
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = OriginalCFrame
+end)
+
+
+
+ammos:AddButton("Buy 7.62 $ 29", function()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    local Root = Character:WaitForChild("HumanoidRootPart")
+    local OriginalCFrame = Root.CFrame
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = CFrame.new(66193, 123616, 5740)
+    task.wait(0.5)
+    local prompt = workspace:WaitForChild("GUNS")
+        :GetChildren()[294]
+        :WaitForChild("Model")
+        :WaitForChild("435")
+        :WaitForChild("BuyPrompt")
+    fireproximityprompt(prompt)
+    task.wait(0.5)
+    Humanoid:ChangeState(0)
+    repeat task.wait() until not LocalPlayer:GetAttribute("LastACPos")
+    Root.CFrame = OriginalCFrame
+end)
+
+
+
+local MenuGroup = Tabs.Settings:AddLeftGroupbox('Menu')
+
+local Server = Tabs.Settings:AddRightGroupbox('Server')
+
+
+
+
+getgenv().TargetPlaceId          = 16472538603
+getgenv().ServerHopEnabled       = true
+getgenv().LowPlayerThreshold     = 1
+getgenv().Http                   = game:GetService("HttpService")
+getgenv().TS                     = game:GetService("TeleportService")
+getgenv().PlayersService         = game:GetService("Players")
+getgenv().LocalPlr               = getgenv().PlayersService.LocalPlayer
+
+Server:AddButton('Join Low Server', function()
+    local PlaceId   = getgenv().TargetPlaceId
+    local MyJobId   = game.JobId
+    local Cursor    = ""
+    
+    local LowestServer = nil
+    local LowestCount  = math.huge
+    
+    repeat
+        local url = "https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"
+        if Cursor ~= "" then
+            url = url .. "&cursor=" .. Cursor
+        end
+        
+        local success, raw = pcall(game.HttpGet, game, url)
+        if not success then
+            warn("HttpGet failed: " .. tostring(raw))
+            break
+        end
+        
+        local data = getgenv().Http:JSONDecode(raw)
+        if not (data and data.data) then
+            warn("Invalid servers response")
+            break
+        end
+        
+        for _, srv in data.data do
+            if srv.id ~= MyJobId and srv.playing > 0 then
+                if srv.playing < LowestCount then
+                    LowestCount  = srv.playing
+                    LowestServer = srv.id
+                    
+                    if LowestCount <= getgenv().LowPlayerThreshold then
+                        break
+                    end
+                end
+            end
+        end
+        
+        if LowestCount <= getgenv().LowPlayerThreshold then
+            break
+        end
+        
+        Cursor = data.nextPageCursor
+    until not Cursor
+    
+    if LowestServer then
+        print("Joining → " .. LowestCount .. " players")
+        getgenv().TS:TeleportToPlaceInstance(PlaceId, LowestServer, getgenv().LocalPlr)
+    else
+        warn("No low-player server found")
+    end
+end)
+
+
+Server:AddButton('Server Hop', function()
+    if not getgenv().ServerHopEnabled then return end
+    
+    local PlaceId = game.PlaceId
+    local MyJobId = game.JobId
+    
+    local url = "https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100"
+    
+    local success, raw = pcall(game.HttpGet, game, url)
+    if not success then
+        warn("HttpGet failed: " .. tostring(raw))
+        return
+    end
+    
+    local data = getgenv().Http:JSONDecode(raw)
+    if not (data and data.data) then
+        warn("Invalid servers response")
+        return
+    end
+    
+    for _, srv in data.data do
+        if srv.id ~= MyJobId and srv.playing < srv.maxPlayers then
+            print("Hopping → " .. srv.playing .. "/" .. srv.maxPlayers)
+            getgenv().TS:TeleportToPlaceInstance(PlaceId, srv.id, getgenv().LocalPlr)
+            break
+        end
+    end
+end)
+
+
+Server:AddButton('Rejoin', function()
+    print("Rejoining...")
+    getgenv().TS:Teleport(game.PlaceId, getgenv().LocalPlr)
+end)
+
+
+
+MenuGroup:AddLabel("Menu bind"):AddKeyPicker("MenuKeybind", {
+    Default = "RightShift",
+    NoUI = true,
+    Text = "Menu keybind"
+})
+
+task.spawn(function()
+    local UserInputService = game:GetService("UserInputService")
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if not gameProcessed and input.KeyCode.Name == Options.MenuKeybind.Value then
+            Library:Toggle()
+        end
+    end)
+end)
+
+
+
+
+MenuGroup:AddDivider()
+MenuGroup:AddButton("Unload", function() Library:Unload() end)
+
+
+
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+
+
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+
+ThemeManager:SetFolder("MyScriptHub")
+SaveManager:SetFolder("MyScriptHub/specific-game")
+
+SaveManager:BuildConfigSection(Tabs["Settings"])
+ThemeManager:ApplyToTab(Tabs["Settings"])
+
+
+Library:OnUnload(function()
+
+end)
+
+
+
+
+
+
+
+
+
+--- small dick nigga trxps script
